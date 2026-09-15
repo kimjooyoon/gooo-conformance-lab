@@ -41,7 +41,7 @@ jobs:
           count=0
           for source in fixtures/best-practices/*.gooo; do
             name="$(basename "$source" .gooo)"
-            go run ./meta-ontology-go/cmd/gooo generate --json "$source" --out "generated/$name" > "receipts/$name.json"
+            (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"
             python3 ci/verify_gooo_generate.py "receipts/$name.json"
             test -n "$(find "generated/$name" -type f -name '*.go' -print -quit)"
             count=$((count + 1))
