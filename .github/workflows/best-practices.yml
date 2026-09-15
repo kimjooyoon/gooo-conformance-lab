@@ -244,6 +244,7 @@ jobs:
             --started-at-ms "$started_at_ms" \
             --generated-compile-wall-ms "$compile_wall_ms" | tee -a "$GITHUB_STEP_SUMMARY"
           python3 ci/compare_corpus_metrics.py | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 ci/write_baseline_candidate.py | tee -a "$GITHUB_STEP_SUMMARY"
           python3 ci/write_improvement_decision.py | tee -a "$GITHUB_STEP_SUMMARY"
           python3 - <<'PY8'
           import json
