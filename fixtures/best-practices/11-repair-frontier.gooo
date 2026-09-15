@@ -1,0 +1,13 @@
+package repairfrontier
+namespace repairfrontier
+
+entity Failure id "repair://entity/failure"
+entity RepairCandidate id "repair://entity/candidate"
+entity RepairDecision id "repair://entity/decision"
+
+activity ObserveFailure(Failure) -> Failure computes "claim.observe:failure"
+activity ProposeRepair(Failure) -> RepairCandidate computes "claim.propose:repair"
+activity RecordDecision(RepairCandidate) -> RepairDecision computes "claim.decide:repair"
+
+bind ObserveFailure.result -> ProposeRepair.input
+bind ProposeRepair.result -> RecordDecision.input
