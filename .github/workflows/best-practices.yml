@@ -284,6 +284,17 @@ jobs:
           cmp receipts/next-domain-operation.json receipts/next-domain-operation-replay.json
           echo "Verified deterministic next-domain-operation replay." >> "$GITHUB_STEP_SUMMARY"
           rm receipts/next-domain-operation-replay.json
+          python3 ci/write_runtime_support_frontier.py \
+            --operation receipts/next-domain-operation.json \
+            --observation receipts/domain-observation.json \
+            --out receipts/runtime-support-frontier.json | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 ci/write_runtime_support_frontier.py \
+            --operation receipts/next-domain-operation.json \
+            --observation receipts/domain-observation.json \
+            --out receipts/runtime-support-frontier-replay.json >/dev/null
+          cmp receipts/runtime-support-frontier.json receipts/runtime-support-frontier-replay.json
+          echo "Verified deterministic runtime support frontier replay." >> "$GITHUB_STEP_SUMMARY"
+          rm receipts/runtime-support-frontier-replay.json
           echo "Verified $count executable .gooo best-practice fixtures." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload generated corpus receipt
