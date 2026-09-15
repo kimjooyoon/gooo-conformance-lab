@@ -61,7 +61,7 @@ jobs:
               raise SystemExit("proposal declares repository writes")
           print("verified bounded observation and proposal-only adoption boundary")
           PY
-          echo "Observed candidates: ${#observation[@]}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Verified bounded observation and proposal-only adoption boundary." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload observation and proposal receipts
         uses: actions/upload-artifact@v5
