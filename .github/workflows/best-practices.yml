@@ -244,6 +244,16 @@ jobs:
             --started-at-ms "$started_at_ms" \
             --generated-compile-wall-ms "$compile_wall_ms" | tee -a "$GITHUB_STEP_SUMMARY"
           python3 ci/compare_corpus_metrics.py | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 ci/write_improvement_decision.py | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 - <<'PY8'
+          import json
+          from pathlib import Path
+
+          decision = json.loads(Path("receipts/improvement-decision.json").read_text())
+          if decision.get("execution_allowed") is not False or decision.get("repository_writes") != 0:
+              raise SystemExit("improvement decision unexpectedly grants execution authority")
+          print("verified non-executing improvement decision")
+          PY8
           wait "$domain_observation_pid"
           tee -a "$GITHUB_STEP_SUMMARY" < receipts/domain-observation-summary.txt
           rm receipts/domain-observation-summary.txt
