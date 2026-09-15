@@ -4,6 +4,15 @@ on:
   pull_request:
   push:
   workflow_dispatch:
+    inputs:
+      artifact_url:
+        description: Public immutable artifact URL to verify
+        required: false
+        type: string
+      artifact_sha256:
+        description: Expected artifact digest in sha256:<64 hex characters> form
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -30,3 +39,33 @@ jobs:
         with:
           name: development-story-conformance
           path: development-story-result.txt
+
+  external-artifact:
+    name: Verify external immutable artifact
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.artifact_url != '' && inputs.artifact_sha256 != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out contract
+        uses: actions/checkout@v5
+      - name: Download public artifact
+        env:
+          ARTIFACT_URL: ${{ inputs.artifact_url }}
+        run: curl --fail --location --proto '=https' --tlsv1.2 "$ARTIFACT_URL" --output external-artifact.bin
+      - name: Verify immutable digest
+        env:
+          EXPECTED_SHA256: ${{ inputs.artifact_sha256 }}
+        run: python3 ci/verify_external_artifact.py external-artifact.bin "$EXPECTED_SHA256" | tee external-artifact-result.json
+      - name: Publish result
+        if: always()
+        run: |
+          {
+            echo '## External immutable artifact'
+            cat external-artifact-result.json 2>/dev/null || true
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload verification receipt
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: external-artifact-verification
+          path: external-artifact-result.json

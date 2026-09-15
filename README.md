@@ -17,6 +17,11 @@ The first contract checks that a development-story observation has:
 The workflow validates the contract in GitHub Actions and publishes a
 human-readable summary plus the normalized observation as an artifact.
 
+When manually dispatched with a public artifact URL and its expected
+SHA-256, the independent consumer job verifies byte identity before any
+future semantic interpretation. Missing inputs skip that optional consumer;
+malformed or mismatched inputs fail closed.
+
 ## What it does not prove
 
 A passing contract check does not prove compiler correctness, user utility,
