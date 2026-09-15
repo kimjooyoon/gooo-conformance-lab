@@ -53,8 +53,6 @@ small problem-solving scenarios that use the same shape:
   while the current runtime boundary records generation as `FAIL_CLOSED`.
 - evidence ledger: keep a domain claim, its observation, counterexample,
   alternative, decision, and next operation as separate inspectable concepts.
-- infrastructure drift resolution: separate the service contract, desired and
-  observed state, drift finding, change plan, validation, and decision.
 
 The compiler observes the declared relationships and the CI observes the
 generated/query results. It does not claim that these declarations execute a
