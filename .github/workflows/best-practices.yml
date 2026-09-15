@@ -41,13 +41,34 @@ jobs:
           count=0
           for source in fixtures/best-practices/*.gooo; do
             name="$(basename "$source" .gooo)"
-            if ! (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"; then
-              cat "receipts/$name.json"
-              echo "generation failed for $source" >&2
-              exit 1
+            if [ "$name" = "10-runtime-chain" ]; then
+              if (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"; then
+                echo "runtime binding generation unexpectedly succeeded" >&2
+                exit 1
+              fi
+              python3 - <<'PY4'
+          import json
+          from pathlib import Path
+
+          receipt = json.loads(Path("receipts/10-runtime-chain.json").read_text())
+          diagnostics = receipt.get("diagnostics", [])
+          if receipt.get("status") != "error" or not any(
+              item.get("code") == "generator.generate"
+              and "runtime bindings are unsupported" in item.get("message", "")
+              for item in diagnostics
+          ):
+              raise SystemExit("runtime binding generation boundary was not explicit")
+          print("recorded expected runtime binding generation boundary")
+          PY4
+            else
+              if ! (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"; then
+                cat "receipts/$name.json"
+                echo "generation failed for $source" >&2
+                exit 1
+              fi
+              python3 ci/verify_gooo_generate.py "receipts/$name.json"
+              test -n "$(find "generated/$name" -type f -name '*.go' -print -quit)"
             fi
-            python3 ci/verify_gooo_generate.py "receipts/$name.json"
-            test -n "$(find "generated/$name" -type f -name '*.go' -print -quit)"
             case "$name" in
               01-domain-model) root="billing://activity/pay-order"; target="billing://entity/order" ;;
               02-provenance-chain) root="delivery://activity/build-artifact"; target="delivery://entity/request" ;;
