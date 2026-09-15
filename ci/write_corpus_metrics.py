@@ -25,6 +25,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--out", required=True)
 parser.add_argument("--started-at-ms", required=True, type=int)
 parser.add_argument("--generated-compile-wall-ms", required=True, type=int)
+parser.add_argument("--generation-query-wall-ms", required=True, type=int)
+parser.add_argument("--runtime-provenance-wall-ms", required=True, type=int)
 args = parser.parse_args()
 
 root = Path(".")
@@ -41,6 +43,8 @@ metrics = {
     "compiler_ref": __import__("os").environ.get("GOOO_REF", ""),
     "catalog_digest": digest(fixture_root / "catalog.json"),
     "corpus_wall_ms": max(0, int(time.time() * 1000) - args.started_at_ms),
+    "generation_query_wall_ms": args.generation_query_wall_ms,
+    "runtime_provenance_wall_ms": args.runtime_provenance_wall_ms,
     "generated_compile_wall_ms": args.generated_compile_wall_ms,
     "fixture_count": len(fixture_files),
     "fixture_gooo_physical_lines": sum(physical_lines(path) for path in fixture_files),

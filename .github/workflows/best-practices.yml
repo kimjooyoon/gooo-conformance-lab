@@ -101,11 +101,13 @@ jobs:
           done
           expected_count="$(python3 ci/catalog_case.py --count)"
           test "$count" -eq "$expected_count"
+          generation_query_wall_ms=$(( $(date +%s%3N) - started_at_ms ))
           printf 'module gooo.generated\n\ngo 1.27\n' > generated/go.mod
           compile_started_at_ms="$(date +%s%3N)"
           (cd generated && go test ./...)
           compile_wall_ms=$(( $(date +%s%3N) - compile_started_at_ms ))
           echo "Verified generated Go compilation for the PASS corpus." >> "$GITHUB_STEP_SUMMARY"
+          runtime_started_at_ms="$(date +%s%3N)"
           if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
             --entry Process \
             --input ../fixtures/best-practices/run-input.json \
@@ -237,12 +239,15 @@ jobs:
               raise SystemExit("repair candidate lost next operation")
           print("verified non-executing repair candidate from runtime refutation")
           PY7
+          runtime_provenance_wall_ms=$(( $(date +%s%3N) - runtime_started_at_ms ))
           python3 ci/write_domain_observation.py --out receipts/domain-observation.json > receipts/domain-observation-summary.txt &
           domain_observation_pid=$!
           python3 ci/write_corpus_metrics.py \
             --out receipts/corpus-metrics.json \
             --started-at-ms "$started_at_ms" \
-            --generated-compile-wall-ms "$compile_wall_ms" | tee -a "$GITHUB_STEP_SUMMARY"
+            --generated-compile-wall-ms "$compile_wall_ms" \
+            --generation-query-wall-ms "$generation_query_wall_ms" \
+            --runtime-provenance-wall-ms "$runtime_provenance_wall_ms" | tee -a "$GITHUB_STEP_SUMMARY"
           python3 ci/compare_corpus_metrics.py | tee -a "$GITHUB_STEP_SUMMARY"
           python3 ci/write_baseline_candidate.py | tee -a "$GITHUB_STEP_SUMMARY"
           python3 ci/write_improvement_decision.py | tee -a "$GITHUB_STEP_SUMMARY"
