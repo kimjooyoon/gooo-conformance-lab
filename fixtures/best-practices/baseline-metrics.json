@@ -1,11 +1,11 @@
 {
   "schema": "gooo/best-practice-corpus-metrics/v1",
-  "source_run_id": 34987697818,
-  "source_commit": "0ae96320dabab353b843266b40b011144107e17b",
+  "source_run_id": 34988919102,
+  "source_commit": "c243ddebcf4bd63feef88b874b78f8b4bf66d8ed",
   "compiler_ref": "46fe6f28fe7cd03fea904bcdbcbf21ac881f8d5e",
-  "catalog_digest": "sha256:bc0507f2ecfca589284c2d0d15348f962c9d2fe336b51e064613da949145a9c7",
-  "corpus_wall_ms": 5143,
-  "generated_compile_wall_ms": 80,
+  "catalog_digest": "sha256:f4fd84f0d3d502c287da20474f3c408da80022e16dbbda7f4859eebf7d71001b",
+  "corpus_wall_ms": 5733,
+  "generated_compile_wall_ms": 96,
   "fixture_count": 16,
   "fixture_gooo_physical_lines": 155,
   "catalog_case_count": 16,
@@ -16,6 +16,6 @@
   "compiler_gooo_files": 73,
   "compiler_gooo_physical_lines": 1994,
   "generated_go_files": 13,
-  "lab_regular_files": 44,
+  "lab_regular_files": 47,
   "lab_descendant_dirs": 590
 }
