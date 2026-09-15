@@ -1,0 +1,18 @@
+package infrastructuredrift
+namespace infrastructuredrift
+
+entity ServiceContract id "infrastructure-drift://entity/service-contract"
+entity DesiredState id "infrastructure-drift://entity/desired-state"
+entity ObservedState id "infrastructure-drift://entity/observed-state"
+entity DriftFinding id "infrastructure-drift://entity/drift-finding"
+entity ChangePlan id "infrastructure-drift://entity/change-plan"
+entity Validation id "infrastructure-drift://entity/validation"
+entity Decision id "infrastructure-drift://entity/decision"
+
+activity DeclareServiceContract(ServiceContract) -> ServiceContract computes "infra.drift:contract"
+activity RecordDesiredState(ServiceContract) -> DesiredState computes "infra.drift:desired"
+activity CaptureObservedState(ServiceContract) -> ObservedState computes "infra.drift:observed"
+activity DescribeDrift(ObservedState) -> DriftFinding computes "infra.drift:compare"
+activity ProposeChangePlan(DriftFinding) -> ChangePlan computes "infra.drift:plan"
+activity ValidateChangePlan(ChangePlan) -> Validation computes "infra.drift:validate"
+activity RecordInfrastructureDecision(Validation) -> Decision computes "infra.drift:decide"
