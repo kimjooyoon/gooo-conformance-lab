@@ -1,0 +1,12 @@
+{
+  "schema": "gooo-development-story/v1",
+  "story_id": "story://example/unknown-attempt",
+  "source_digest": "sha256:source-example-0001",
+  "artifact_digest": "sha256:artifact-example-0001",
+  "state": "UNKNOWN",
+  "stage": "EVIDENCE",
+  "step": "CAPTURE_ATTEMPT_RECEIPT",
+  "reason": "ATTEMPT_RECEIPT_MISSING",
+  "next_operation": "RECORD_OR_IMPORT_ATTEMPT_RECEIPT",
+  "blocked_by": []
+}

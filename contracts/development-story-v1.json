@@ -1,0 +1,17 @@
+{
+  "schema": "gooo-development-story/v1",
+  "required": [
+    "story_id",
+    "source_digest",
+    "artifact_digest",
+    "state",
+    "stage",
+    "step",
+    "reason",
+    "next_operation",
+    "blocked_by"
+  ],
+  "states": ["CLOSED", "UNKNOWN", "REFUTED"],
+  "unknown_requires": ["stage", "step", "reason", "next_operation", "blocked_by"],
+  "digest_prefix": "sha256:"
+}
