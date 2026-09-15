@@ -31,6 +31,10 @@ real `.gooo` query through `go run ./cmd/gooo`, and validates the returned
 query envelope. Digest verification alone is not treated as Gooo
 functionality.
 
+The generation job uses the same pinned compiler to run `gooo generate`,
+checks the JSON generation envelope, and requires a generated Go file in the
+output directory. Query and generation are separate observations.
+
 ## What it does not prove
 
 A passing contract check does not prove compiler correctness, user utility,
