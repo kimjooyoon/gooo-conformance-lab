@@ -82,12 +82,28 @@ jobs:
               10-runtime-chain) root="runtime-chain://activity/produce"; target="runtime-chain://entity/integer" ;;
               *) echo "unknown best-practice fixture: $name" >&2; exit 1 ;;
             esac
-            if ! (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"; then
-              cat "receipts/$name-query.json"
-              echo "query failed for $source" >&2
-              exit 1
+            if [ "$name" = "10-runtime-chain" ]; then
+              if (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"; then
+                echo "runtime-only query endpoint unexpectedly succeeded" >&2
+                exit 1
+              fi
+              python3 - <<'PY5'
+          import json
+          from pathlib import Path
+
+          receipt = json.loads(Path("receipts/10-runtime-chain-query.json").read_text())
+          if receipt.get("status") != "error" or receipt.get("error", {}).get("code") != "unknown_endpoint":
+              raise SystemExit("runtime-only query boundary was not explicit")
+          print("recorded expected runtime-only query boundary")
+          PY5
+            else
+              if ! (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"; then
+                cat "receipts/$name-query.json"
+                echo "query failed for $source" >&2
+                exit 1
+              fi
+              python3 ci/verify_gooo_query_case.py "receipts/$name-query.json" "$root" "$target"
             fi
-            python3 ci/verify_gooo_query_case.py "receipts/$name-query.json" "$root" "$target"
             count=$((count + 1))
           done
           test "$count" -eq 10
