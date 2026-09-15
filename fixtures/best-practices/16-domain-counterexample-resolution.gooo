@@ -1,0 +1,14 @@
+package domaincounterexample
+namespace domaincounterexample
+
+entity Problem id "domain-counterexample://entity/problem"
+entity Hypothesis id "domain-counterexample://entity/hypothesis"
+entity Counterexample id "domain-counterexample://entity/counterexample"
+entity Resolution id "domain-counterexample://entity/resolution"
+entity Decision id "domain-counterexample://entity/decision"
+
+activity DescribeProblem(Problem) -> Problem computes "domain.counterexample:describe"
+activity FormHypothesis(Problem) -> Hypothesis computes "domain.counterexample:hypothesize"
+activity RecordCounterexample(Hypothesis) -> Counterexample computes "domain.counterexample:refute"
+activity ProposeResolution(Counterexample) -> Resolution computes "domain.counterexample:resolve"
+activity RecordDecision(Resolution) -> Decision computes "domain.counterexample:decide"

@@ -45,6 +45,8 @@ small problem-solving scenarios that use the same shape:
   a validation result as separate operational domain concepts.
 - improvement governance: declare metric observation, candidate preservation,
   independent review, and adoption decision as separate concepts.
+- counterexample resolution: describe a problem, preserve a hypothesis and its
+  counterexample, then propose and record a bounded alternative resolution.
 
 The compiler observes the declared relationships and the CI observes the
 generated/query results. It does not claim that these declarations execute a

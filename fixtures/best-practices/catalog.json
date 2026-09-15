@@ -16,5 +16,6 @@
     {"id": "13-domain-binding-boundary", "source": "13-domain-binding-boundary.gooo", "generation": "FAIL_CLOSED", "root": "problemresolutionboundary://activity/observe-problem", "target": "domain-boundary://entity/problem"}
     ,{"id": "14-infrastructure-contract", "source": "14-infrastructure-contract.gooo", "generation": "PASS", "root": "infrastructurecontract://activity/declare-contract", "target": "infra://entity/service-contract"}
     ,{"id": "15-improvement-governance", "source": "15-improvement-governance.gooo", "generation": "PASS", "root": "improvementgovernance://activity/capture-metric", "target": "self-improvement://entity/metric"}
+    ,{"id": "16-domain-counterexample-resolution", "source": "16-domain-counterexample-resolution.gooo", "generation": "PASS", "root": "domaincounterexample://activity/describe-problem", "target": "domain-counterexample://entity/problem"}
   ]
 }
