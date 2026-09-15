@@ -49,6 +49,8 @@ small problem-solving scenarios that use the same shape:
   counterexample, then propose and record a bounded alternative resolution.
 - incident learning: capture an incident, form a hypothesis, run an experiment,
   observe its result, and record a decision as a replayable domain trail.
+- incident resolution boundary: preserve a typed incident-to-resolution bind
+  while the current runtime boundary records generation as `FAIL_CLOSED`.
 
 The compiler observes the declared relationships and the CI observes the
 generated/query results. It does not claim that these declarations execute a
