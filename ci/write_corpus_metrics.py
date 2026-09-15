@@ -21,6 +21,33 @@ def files_under(root, excluded):
     ]
 
 
+def language_inventory(root, compiler_files, lab_files):
+    entries = []
+    for path in compiler_files:
+        if path.suffix not in {".go", ".gooo"}:
+            continue
+        entries.append(
+            {
+                "scope": "compiler",
+                "path": (Path(root.name) / path.relative_to(root)).as_posix(),
+                "language": path.suffix[1:],
+                "physical_lines": physical_lines(path),
+            }
+        )
+    for path in lab_files:
+        if path.suffix not in {".go", ".gooo"}:
+            continue
+        entries.append(
+            {
+                "scope": "lab",
+                "path": path.relative_to(root).as_posix(),
+                "language": path.suffix[1:],
+                "physical_lines": physical_lines(path),
+            }
+        )
+    return sorted(entries, key=lambda item: (item["scope"], item["path"]))
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--out", required=True)
 parser.add_argument("--started-at-ms", required=True, type=int)
@@ -37,6 +64,7 @@ compiler_files = files_under(root / "meta-ontology-go", {".git"})
 lab_files = files_under(root, {".git", "meta-ontology-go", "generated", "receipts", "repair"})
 fixture_files = sorted(fixture_root.glob("*.gooo"))
 generated_files = files_under(root / "generated", {".git"})
+language_files = language_inventory(root, compiler_files, lab_files)
 
 metrics = {
     "schema": "gooo/best-practice-corpus-metrics/v1",
@@ -57,6 +85,11 @@ metrics = {
     "compiler_gooo_physical_lines": sum(physical_lines(path) for path in compiler_files if path.suffix == ".gooo"),
     "generated_go_files": sum(path.suffix == ".go" for path in generated_files),
     "lab_regular_files": len(lab_files),
+    "language_file_inventory": language_files,
+    "language_go_files": sum(item["language"] == "go" for item in language_files),
+    "language_go_physical_lines": sum(item["physical_lines"] for item in language_files if item["language"] == "go"),
+    "language_gooo_files": sum(item["language"] == "gooo" for item in language_files),
+    "language_gooo_physical_lines": sum(item["physical_lines"] for item in language_files if item["language"] == "gooo"),
     "lab_descendant_dirs": sum(
         1
         for path in root.rglob("*")
@@ -69,5 +102,9 @@ output.parent.mkdir(parents=True, exist_ok=True)
 output.write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n")
 print("### Corpus metrics")
 for key, value in metrics.items():
-    if key != "schema":
+    if key not in {"schema", "language_file_inventory"}:
         print(f"- {key}: `{value}`")
+print("### Language file inventory")
+for item in language_files:
+    if item["language"] == "gooo":
+        print(f"- {item['scope']}/{item['path']}: `{item['language']}` `{item['physical_lines']}` physical lines")
