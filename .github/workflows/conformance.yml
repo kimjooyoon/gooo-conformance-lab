@@ -13,6 +13,25 @@ on:
         description: Expected artifact digest in sha256:<64 hex characters> form
         required: false
         type: string
+      gooo_ref:
+        description: Immutable meta-ontology-go commit to execute
+        required: false
+        default: 9914e0db4cb83234e11ad00b03f115e37b0a740a
+        type: string
+  workflow_call:
+    inputs:
+      artifact_url:
+        description: Public immutable artifact URL to verify
+        required: true
+        type: string
+      artifact_sha256:
+        description: Expected artifact digest in sha256:<64 hex characters> form
+        required: true
+        type: string
+      gooo_ref:
+        description: Immutable meta-ontology-go commit to execute
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -42,7 +61,7 @@ jobs:
 
   external-artifact:
     name: Verify external immutable artifact
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.artifact_url != '' && inputs.artifact_sha256 != '' }}
+    if: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call') && inputs.artifact_url != '' && inputs.artifact_sha256 != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -69,3 +88,41 @@ jobs:
         with:
           name: external-artifact-verification
           path: external-artifact-result.json
+
+  gooo-language:
+    name: Execute Gooo query fixture
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out conformance fixture
+        uses: actions/checkout@v5
+      - name: Check out pinned Gooo compiler
+        env:
+          GOOO_REF: ${{ inputs.gooo_ref || '9914e0db4cb83234e11ad00b03f115e37b0a740a' }}
+        run: |
+          git clone --filter=blob:none --no-checkout https://github.com/kimjooyoon/meta-ontology-go.git meta-ontology-go
+          git -C meta-ontology-go fetch --depth 1 origin "$GOOO_REF"
+          git -C meta-ontology-go checkout --detach FETCH_HEAD
+      - name: Execute Gooo query
+        run: |
+          cd meta-ontology-go
+          go run ./cmd/gooo query --json ../fixtures/basic-query.gooo --exact \
+            --root billing://activity/pay-order \
+            --relation prov:used \
+            --target billing://entity/order \
+            --limit 10 > ../gooo-query-result.json
+      - name: Verify language result
+        run: python3 ci/verify_gooo_query.py gooo-query-result.json
+      - name: Publish language result
+        if: always()
+        run: |
+          {
+            echo '## Gooo language execution'
+            cat gooo-query-result.json 2>/dev/null || true
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload language receipt
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: gooo-language-query-receipt
+          path: gooo-query-result.json

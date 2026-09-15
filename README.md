@@ -22,6 +22,15 @@ SHA-256, the independent consumer job verifies byte identity before any
 future semantic interpretation. Missing inputs skip that optional consumer;
 malformed or mismatched inputs fail closed.
 
+The same consumer job is exposed as a reusable workflow, so a producer
+repository can invoke this lab after publishing an immutable public artifact
+without copying the validator into the producer repository.
+
+The language job checks out an immutable `meta-ontology-go` commit, executes a
+real `.gooo` query through `go run ./cmd/gooo`, and validates the returned
+query envelope. Digest verification alone is not treated as Gooo
+functionality.
+
 ## What it does not prove
 
 A passing contract check does not prove compiler correctness, user utility,
