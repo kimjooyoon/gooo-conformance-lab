@@ -53,7 +53,7 @@ jobs:
               06-change-review) root="governance://activity/review-repair"; target="governance://entity/problem-report" ;;
               07-self-improvement-loop) root="evolution://activity/observe-problem"; target="evolution://entity/observed-problem" ;;
               08-counterexample-guided-repair) root="repair://activity/observe-failure"; target="repair://entity/failure-observation" ;;
-              09-runtime-plan) root="runtime://activity/process"; target="runtime://entity/input" ;;
+              09-runtime-plan) root="runtime://activity/process"; target="runtime://entity/integer" ;;
               *) echo "unknown best-practice fixture: $name" >&2; exit 1 ;;
             esac
             (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"

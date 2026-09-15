@@ -31,8 +31,9 @@ small problem-solving scenarios that use the same shape:
   candidate with baseline behavior, retain a counterexample, and decide the
   next run.
 - runtime plan: execute a single-input activity through the value execution
-  plan with an explicit `computes` program. Multi-input domain declarations
-  remain semantic-only until that runtime signature boundary is extended.
+  plan with an explicit `computes` program and the current `Integer -> Integer`
+  runtime signature. Domain-specific types and multi-input declarations remain
+  semantic-only until those runtime boundaries are extended.
 
 The compiler observes the declared relationships and the CI observes the
 generated/query results. It does not claim that these declarations execute a

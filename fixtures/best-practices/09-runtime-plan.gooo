@@ -1,7 +1,6 @@
 package runtime
 namespace runtime
 
-entity Input id "runtime://entity/input"
-entity Output id "runtime://entity/output"
+entity Integer id "runtime://entity/integer"
 
-activity Process(Input) -> Output computes "int.add:1"
+activity Process(Integer) -> Integer computes "int.add:1"
