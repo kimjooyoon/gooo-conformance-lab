@@ -19,7 +19,7 @@ permissions:
   contents: read
 
 env:
-  GOOO_REF: 1c384f2fe99589b0c5e3b95a422ba79c953cf7a9
+  GOOO_REF: 7840eb793b11486af0269d7c8e4518f9c655061c
 
 jobs:
   authorized-adoption:
