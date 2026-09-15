@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 env:
-  GOOO_REF: 9914e0db4cb83234e11ad00b03f115e37b0a740a
+  GOOO_REF: 97944bfd4d606420bb163edc766a0cf2d9c5453f
 
 jobs:
   observe-and-propose:
