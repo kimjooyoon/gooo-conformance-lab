@@ -46,7 +46,7 @@ jobs:
           count=0
           for source in fixtures/best-practices/*.gooo; do
             name="$(basename "$source" .gooo)"
-            if [ "$name" = "10-runtime-chain" ]; then
+            if [ "$name" = "10-runtime-chain" ] || [ "$name" = "11-repair-frontier" ]; then
               if (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"; then
                 echo "runtime binding generation unexpectedly succeeded" >&2
                 exit 1
