@@ -27,6 +27,9 @@ small problem-solving scenarios that use the same shape:
 - change review: review a repair candidate against a reported problem.
 - self-improvement loop: observe a problem, compare a repair candidate with a
   baseline, and record a human decision.
+- counterexample-guided repair: preserve a failure observation, compare a
+  candidate with baseline behavior, retain a counterexample, and decide the
+  next run.
 
 The compiler observes the declared relationships and the CI observes the
 generated/query results. It does not claim that these declarations execute a

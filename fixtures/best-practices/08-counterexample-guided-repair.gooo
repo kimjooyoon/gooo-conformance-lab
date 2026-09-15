@@ -1,0 +1,12 @@
+package repair
+namespace repair
+
+entity FailureObservation id "repair://entity/failure-observation"
+entity RepairCandidate id "repair://entity/repair-candidate"
+entity BaselineBehavior id "repair://entity/baseline-behavior"
+entity Counterexample id "repair://entity/counterexample"
+entity NextRunDecision id "repair://entity/next-run-decision"
+
+activity ObserveFailure(FailureObservation) -> RepairCandidate
+activity CompareRepair(RepairCandidate, BaselineBehavior) -> Counterexample
+activity DecideNextRun(Counterexample) -> NextRunDecision
