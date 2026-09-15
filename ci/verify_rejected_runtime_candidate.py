@@ -17,6 +17,7 @@ args = parser.parse_args()
 
 baseline_path = Path(args.baseline)
 candidate_path = Path(args.candidate)
+candidate_source_path = Path(args.candidate_source)
 baseline = json.loads(baseline_path.read_text())
 candidate = json.loads(candidate_path.read_text())
 if baseline.get("decision") != "PASS":
@@ -25,7 +26,8 @@ if candidate.get("decision") != "FAIL_CLOSED":
     raise SystemExit("overflow candidate was not fail-closed")
 if candidate.get("reason") != "VALUE_INTEGER_OVERFLOW":
     raise SystemExit("overflow candidate reason was not explicit")
-if baseline.get("source_digest") == candidate.get("source_digest"):
+candidate_source_digest = digest(candidate_source_path)
+if baseline.get("source_digest") == candidate_source_digest:
     raise SystemExit("rejected candidate did not change source identity")
 
 receipt = {
@@ -37,7 +39,7 @@ receipt = {
     },
     "candidate": {
         "receipt_digest": digest(candidate_path),
-        "source_digest": candidate["source_digest"],
+        "source_digest": candidate_source_digest,
         "source_path": args.candidate_source,
         "decision": candidate["decision"],
         "reason": candidate["reason"],
