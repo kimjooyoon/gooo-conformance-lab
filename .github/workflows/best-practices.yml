@@ -60,10 +60,13 @@ jobs:
             count=$((count + 1))
           done
           test "$count" -eq 8
-          (cd meta-ontology-go && go run ./cmd/gooo run --json \
+          if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
             --entry PayOrder \
             --input ../fixtures/best-practices/run-input.json \
-            ../fixtures/best-practices/01-domain-model.gooo) > receipts/runtime.json
+            ../fixtures/best-practices/01-domain-model.gooo) > receipts/runtime.json; then
+            cat receipts/runtime.json
+            exit 1
+          fi
           python3 - <<'PY'
           import json
           from pathlib import Path
