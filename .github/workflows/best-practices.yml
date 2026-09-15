@@ -156,6 +156,21 @@ jobs:
           cmp receipts/runtime-improvement-review.json receipts/runtime-improvement-review-replay.json
           echo "Verified deterministic runtime candidate review replay." >> "$GITHUB_STEP_SUMMARY"
           rm receipts/runtime-improvement-review-replay.json
+          python3 ci/prepare_rejected_runtime_candidate.py \
+            --source fixtures/best-practices/09-runtime-plan.gooo \
+            --out candidate/overflow-runtime-candidate.gooo
+          if (cd meta-ontology-go && go run ./cmd/gooo run --json \
+            --entry Process \
+            --input ../fixtures/best-practices/run-input.json \
+            ../candidate/overflow-runtime-candidate.gooo) > candidate/overflow-runtime.json; then
+            echo "overflow runtime candidate unexpectedly passed" >&2
+            exit 1
+          fi
+          python3 ci/verify_rejected_runtime_candidate.py \
+            --baseline receipts/runtime.json \
+            --candidate candidate/overflow-runtime.json \
+            --candidate-source candidate/overflow-runtime-candidate.gooo \
+            --out receipts/runtime-improvement-rejection.json
           if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
             --entry Produce \
             --input ../fixtures/best-practices/run-input.json \
