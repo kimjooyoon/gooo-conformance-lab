@@ -1,0 +1,9 @@
+package runtimechain
+namespace runtimechain
+
+entity Integer id "runtime-chain://entity/integer"
+
+activity Produce(Integer) -> Integer computes "int.add:1"
+activity Consume(Integer) -> Integer computes "int.add:1"
+
+bind Produce.result -> Consume.input

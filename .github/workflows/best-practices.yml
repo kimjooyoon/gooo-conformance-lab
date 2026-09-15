@@ -54,13 +54,14 @@ jobs:
               07-self-improvement-loop) root="evolution://activity/observe-problem"; target="evolution://entity/observed-problem" ;;
               08-counterexample-guided-repair) root="repair://activity/observe-failure"; target="repair://entity/failure-observation" ;;
               09-runtime-plan) root="runtime://activity/process"; target="runtime://entity/integer" ;;
+              10-runtime-chain) root="runtime-chain://activity/produce"; target="runtime-chain://entity/integer" ;;
               *) echo "unknown best-practice fixture: $name" >&2; exit 1 ;;
             esac
             (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"
             python3 ci/verify_gooo_query_case.py "receipts/$name-query.json" "$root" "$target"
             count=$((count + 1))
           done
-          test "$count" -eq 9
+          test "$count" -eq 10
           if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
             --entry Process \
             --input ../fixtures/best-practices/run-input.json \
@@ -80,6 +81,24 @@ jobs:
           if not runtime.get("execution", {}).get("activities"):
               raise SystemExit("runtime receipt contains no executed activity")
           print("verified Gooo value execution plan")
+          (cd meta-ontology-go && go run ./cmd/gooo run --json \
+            --entry Produce \
+            --input ../fixtures/best-practices/run-input.json \
+            ../fixtures/best-practices/10-runtime-chain.gooo) > receipts/runtime-chain.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          runtime = json.loads(Path("receipts/runtime-chain.json").read_text())
+          if runtime.get("decision") != "PASS":
+              raise SystemExit("Gooo runtime chain did not pass")
+          execution = runtime.get("execution", {})
+          if execution.get("activities") != ["Produce", "Consume"]:
+              raise SystemExit("runtime chain activity order was not deterministic")
+          if execution.get("deliveries") != 1:
+              raise SystemExit("runtime chain did not deliver one bound result")
+          print("verified bound Gooo runtime chain")
+          PY
           PY
           echo "Verified $count executable .gooo best-practice fixtures." >> "$GITHUB_STEP_SUMMARY"
 

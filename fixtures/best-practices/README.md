@@ -34,6 +34,8 @@ small problem-solving scenarios that use the same shape:
   plan with an explicit `computes` program and the current `Integer -> Integer`
   runtime signature. Domain-specific types and multi-input declarations remain
   semantic-only until those runtime boundaries are extended.
+- runtime chain: execute two Integer activities through an explicit `bind`
+  edge and verify deterministic activity order plus one result delivery.
 
 The compiler observes the declared relationships and the CI observes the
 generated/query results. It does not claim that these declarations execute a
