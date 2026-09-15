@@ -16,3 +16,8 @@ authorization flag and caller-provided authority id. The workflow binds that
 authorization to its freshly generated proposal, then lets the compiler
 verify every digest before bounded in-memory reuse. Its output is uploaded as
 an artifact; it never writes the repository.
+
+The authorization proposal binding intentionally uses the proposal file's
+raw-byte digest because that is the current `gooo adopt` CLI boundary. This is
+distinct from the compiler's internal canonical proposal digest and is kept
+visible in the workflow rather than silently approximated.

@@ -67,6 +67,7 @@ jobs:
               "fmt"
               "os"
 
+              "github.com/kimjooyoon/meta-ontology-go/internal/cache"
               "github.com/kimjooyoon/meta-ontology-go/internal/meta/generation"
           )
 
@@ -75,13 +76,11 @@ jobs:
               if err != nil { panic(err) }
               var proposal generation.SemanticAdoptionProposal
               if err := json.Unmarshal(proposalData, &proposal); err != nil { panic(err) }
-              digest, err := generation.SemanticAdoptionProposalDigest(proposal)
-              if err != nil { panic(err) }
               authorization := generation.SemanticAdoptionAuthorization{
                   Schema: generation.SemanticAdoptionAuthorizationSchema,
                   AuthorizationID: os.Getenv("AUTHORITY_ID"),
                   AuthorizationMode: generation.SemanticAdoptionAuthorizationMode,
-                  ProposalDigest: digest,
+                  ProposalDigest: cache.HashBytes(proposalData).String(),
                   CandidateStableID: proposal.Candidate.StableID,
                   CandidateInputDigest: proposal.Candidate.InputDigest,
                   ContractDigest: proposal.ContractDigest,
