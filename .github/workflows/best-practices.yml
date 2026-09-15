@@ -123,6 +123,30 @@ jobs:
           print("verified Gooo value execution plan")
           PY2
           python3 ci/verify_runtime_value.py receipts/runtime.json
+          mkdir -p candidate
+          python3 ci/prepare_runtime_candidate.py \
+            --source fixtures/best-practices/09-runtime-plan.gooo \
+            --out candidate/runtime-candidate.gooo
+          if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
+            --entry Process \
+            --input ../fixtures/best-practices/run-input.json \
+            ../candidate/runtime-candidate.gooo) > candidate/runtime.json; then
+            cat candidate/runtime.json
+            exit 1
+          fi
+          if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
+            --entry Process \
+            --input ../fixtures/best-practices/run-input.json \
+            ../candidate/runtime-candidate.gooo) > candidate/runtime-replay.json; then
+            cat candidate/runtime-replay.json
+            exit 1
+          fi
+          cmp candidate/runtime.json candidate/runtime-replay.json
+          python3 ci/verify_runtime_candidate.py \
+            --baseline receipts/runtime.json \
+            --candidate candidate/runtime.json \
+            --candidate-source candidate/runtime-candidate.gooo \
+            --out receipts/runtime-improvement-candidate.json
           if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
             --entry Produce \
             --input ../fixtures/best-practices/run-input.json \
