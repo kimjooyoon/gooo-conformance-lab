@@ -275,3 +275,24 @@ jobs:
             generated
             receipts
             repair
+
+  review-improvement:
+    name: Independent improvement candidate review
+    needs: execute-corpus
+    if: needs.execute-corpus.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Checkout conformance lab
+        uses: actions/checkout@v5
+      - name: Download corpus evidence
+        uses: actions/download-artifact@v6
+        with:
+          name: gooo-best-practice-corpus
+          path: review-artifact
+          run-id: ${{ github.run_id }}
+          github-token: ${{ github.token }}
+      - name: Review improvement decision independently
+        run: python3 ci/review_improvement_decision.py
