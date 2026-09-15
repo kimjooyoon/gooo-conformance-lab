@@ -1,11 +1,16 @@
 import argparse
 import json
 import time
+import hashlib
 from pathlib import Path
 
 
 def physical_lines(path):
     return len(path.read_text().splitlines())
+
+
+def digest(path):
+    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def files_under(root, excluded):
@@ -33,6 +38,8 @@ generated_files = files_under(root / "generated", {".git"})
 
 metrics = {
     "schema": "gooo/best-practice-corpus-metrics/v1",
+    "compiler_ref": __import__("os").environ.get("GOOO_REF", ""),
+    "catalog_digest": digest(fixture_root / "catalog.json"),
     "corpus_wall_ms": max(0, int(time.time() * 1000) - args.started_at_ms),
     "generated_compile_wall_ms": args.generated_compile_wall_ms,
     "fixture_count": len(fixture_files),

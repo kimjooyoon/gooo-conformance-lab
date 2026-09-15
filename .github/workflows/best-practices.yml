@@ -241,6 +241,7 @@ jobs:
             --out receipts/corpus-metrics.json \
             --started-at-ms "$started_at_ms" \
             --generated-compile-wall-ms "$compile_wall_ms" | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 ci/compare_corpus_metrics.py | tee -a "$GITHUB_STEP_SUMMARY"
           python3 ci/write_domain_observation.py --out receipts/domain-observation.json | tee -a "$GITHUB_STEP_SUMMARY"
           python3 ci/write_domain_observation.py --out receipts/domain-observation-replay.json >/dev/null
           cmp receipts/domain-observation.json receipts/domain-observation-replay.json
