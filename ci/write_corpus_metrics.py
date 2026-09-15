@@ -1,5 +1,6 @@
 import argparse
 import json
+import time
 from pathlib import Path
 
 
@@ -17,6 +18,8 @@ def files_under(root, excluded):
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--out", required=True)
+parser.add_argument("--started-at-ms", required=True, type=int)
+parser.add_argument("--generated-compile-wall-ms", required=True, type=int)
 args = parser.parse_args()
 
 root = Path(".")
@@ -30,6 +33,8 @@ generated_files = files_under(root / "generated", {".git"})
 
 metrics = {
     "schema": "gooo/best-practice-corpus-metrics/v1",
+    "corpus_wall_ms": max(0, int(time.time() * 1000) - args.started_at_ms),
+    "generated_compile_wall_ms": args.generated_compile_wall_ms,
     "fixture_count": len(fixture_files),
     "fixture_gooo_physical_lines": sum(physical_lines(path) for path in fixture_files),
     "catalog_case_count": len(cases),

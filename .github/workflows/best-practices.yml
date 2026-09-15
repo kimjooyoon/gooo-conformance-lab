@@ -43,6 +43,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p generated receipts
+          started_at_ms="$(date +%s%3N)"
           python3 - <<'PY0'
           import json
           from pathlib import Path
@@ -101,7 +102,9 @@ jobs:
           expected_count="$(python3 ci/catalog_case.py --count)"
           test "$count" -eq "$expected_count"
           printf 'module gooo.generated\n\ngo 1.27\n' > generated/go.mod
+          compile_started_at_ms="$(date +%s%3N)"
           (cd generated && go test ./...)
+          compile_wall_ms=$(( $(date +%s%3N) - compile_started_at_ms ))
           echo "Verified generated Go compilation for the PASS corpus." >> "$GITHUB_STEP_SUMMARY"
           if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
             --entry Process \
@@ -234,7 +237,10 @@ jobs:
               raise SystemExit("repair candidate lost next operation")
           print("verified non-executing repair candidate from runtime refutation")
           PY7
-          python3 ci/write_corpus_metrics.py --out receipts/corpus-metrics.json | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 ci/write_corpus_metrics.py \
+            --out receipts/corpus-metrics.json \
+            --started-at-ms "$started_at_ms" \
+            --generated-compile-wall-ms "$compile_wall_ms" | tee -a "$GITHUB_STEP_SUMMARY"
           python3 ci/write_domain_observation.py --out receipts/domain-observation.json | tee -a "$GITHUB_STEP_SUMMARY"
           python3 ci/write_domain_observation.py --out receipts/domain-observation-replay.json >/dev/null
           cmp receipts/domain-observation.json receipts/domain-observation-replay.json
