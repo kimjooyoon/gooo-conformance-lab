@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 env:
-  GOOO_REF: 97944bfd4d606420bb163edc766a0cf2d9c5453f
+  GOOO_REF: 9a733fa335c2b4c3cb24e094caecc731e387a367
 
 jobs:
   execute-corpus:
@@ -118,19 +118,38 @@ jobs:
             cat receipts/runtime-chain.json
             exit 1
           fi
+          if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
+            --entry Produce \
+            --input ../fixtures/best-practices/run-input.json \
+            ../fixtures/best-practices/10-runtime-chain.gooo) > receipts/runtime-chain-replay.json; then
+            cat receipts/runtime-chain-replay.json
+            exit 1
+          fi
           python3 - <<'PY3'
           import json
           from pathlib import Path
 
           runtime = json.loads(Path("receipts/runtime-chain.json").read_text())
+          replay = json.loads(Path("receipts/runtime-chain-replay.json").read_text())
           if runtime.get("decision") != "PASS":
               raise SystemExit("Gooo runtime chain did not pass")
           execution = runtime.get("execution", {})
+          replay_execution = replay.get("execution", {})
           if execution.get("activities") != ["Produce", "Consume"]:
               raise SystemExit("runtime chain activity order was not deterministic")
           if execution.get("deliveries") != 1:
               raise SystemExit("runtime chain did not deliver one bound result")
+          for field in ("plan_digest", "input_digest", "execution_digest"):
+              if not execution.get(field) or not replay_execution.get(field):
+                  raise SystemExit(f"runtime provenance field missing: {field}")
+          if execution["plan_digest"] != replay_execution["plan_digest"]:
+              raise SystemExit("runtime plan digest changed across replay")
+          if execution["input_digest"] != replay_execution["input_digest"]:
+              raise SystemExit("runtime input digest changed across replay")
+          if execution["execution_digest"] != replay_execution["execution_digest"]:
+              raise SystemExit("runtime execution digest changed across replay")
           print("verified bound Gooo runtime chain")
+          print("verified deterministic runtime provenance replay")
           PY3
           echo "Verified $count executable .gooo best-practice fixtures." >> "$GITHUB_STEP_SUMMARY"
 
