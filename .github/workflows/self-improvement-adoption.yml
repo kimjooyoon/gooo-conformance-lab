@@ -58,31 +58,45 @@ jobs:
           (cd meta-ontology-go && go run ./cmd/gooo propose \
             ../observation/compiler-observation.json \
             --out ../proposal)
-          python3 - <<'PY'
-          import hashlib
-          import json
-          import os
-          from pathlib import Path
+          test "$AUTHORIZE_ADOPTION" = "true"
+          cat > meta-ontology-go/cmd/gooo-conformance-authorize.go <<'GO'
+          package main
 
-          if os.environ["AUTHORIZE_ADOPTION"] != "true":
-              raise SystemExit("explicit adoption authorization was not granted")
-          proposal_path = Path("proposal/adoption-proposal.json")
-          proposal = json.loads(proposal_path.read_text())
-          authorization = {
-              "schema": "gooo/semantic-self-adoption-authorization/v1",
-              "authorization_id": os.environ["AUTHORITY_ID"],
-              "authorization_mode": "explicit-human-input",
-              "proposal_digest": "sha256:" + hashlib.sha256(proposal_path.read_bytes()).hexdigest(),
-              "candidate_stable_id": proposal["candidate"]["stable_id"],
-              "candidate_input_digest": proposal["candidate"]["input_digest"],
-              "contract_digest": proposal["contract_digest"],
-              "input_source_digest": proposal["input_source_digest"],
-              "authorized": True,
-              "repository_writes": 0,
-              "local_test_executions": 0,
+          import (
+              "encoding/json"
+              "fmt"
+              "os"
+
+              "github.com/kimjooyoon/meta-ontology-go/internal/meta/generation"
+          )
+
+          func main() {
+              proposalData, err := os.ReadFile("proposal/adoption-proposal.json")
+              if err != nil { panic(err) }
+              var proposal generation.SemanticAdoptionProposal
+              if err := json.Unmarshal(proposalData, &proposal); err != nil { panic(err) }
+              digest, err := generation.SemanticAdoptionProposalDigest(proposal)
+              if err != nil { panic(err) }
+              authorization := generation.SemanticAdoptionAuthorization{
+                  Schema: generation.SemanticAdoptionAuthorizationSchema,
+                  AuthorizationID: os.Getenv("AUTHORITY_ID"),
+                  AuthorizationMode: generation.SemanticAdoptionAuthorizationMode,
+                  ProposalDigest: digest,
+                  CandidateStableID: proposal.Candidate.StableID,
+                  CandidateInputDigest: proposal.Candidate.InputDigest,
+                  ContractDigest: proposal.ContractDigest,
+                  InputSourceDigest: proposal.InputSourceDigest,
+                  Authorized: true,
+                  RepositoryWrites: 0,
+                  LocalTestExecutions: 0,
+              }
+              data, err := json.MarshalIndent(authorization, "", "  ")
+              if err != nil { panic(err) }
+              if err := os.WriteFile("authorization/explicit.json", append(data, '\n'), 0644); err != nil { panic(err) }
+              fmt.Println("created compiler-bound explicit authorization")
           }
-          Path("authorization/explicit.json").write_text(json.dumps(authorization, indent=2) + "\n")
-          PY
+          GO
+          (cd meta-ontology-go && go run ./cmd/gooo-conformance-authorize.go)
           (cd meta-ontology-go && go run ./cmd/gooo adopt \
             ../fixtures/self-improvement-observation/observation.gooo \
             --input ../fixtures/self-improvement-observation/input.gooo \
