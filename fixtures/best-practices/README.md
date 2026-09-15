@@ -47,6 +47,8 @@ small problem-solving scenarios that use the same shape:
   independent review, and adoption decision as separate concepts.
 - counterexample resolution: describe a problem, preserve a hypothesis and its
   counterexample, then propose and record a bounded alternative resolution.
+- incident learning: capture an incident, form a hypothesis, run an experiment,
+  observe its result, and record a decision as a replayable domain trail.
 
 The compiler observes the declared relationships and the CI observes the
 generated/query results. It does not claim that these declarations execute a
