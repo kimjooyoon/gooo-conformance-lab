@@ -48,6 +48,25 @@ def language_inventory(root, compiler_files, lab_files):
     return sorted(entries, key=lambda item: (item["scope"], item["path"]))
 
 
+def directory_inventory(root, excluded):
+    directories = [root]
+    directories.extend(path for path in root.rglob("*") if path.is_dir())
+    entries = []
+    for directory in directories:
+        relative = directory.relative_to(root)
+        if any(part in excluded for part in relative.parts):
+            continue
+        children = [path for path in directory.iterdir() if path.name not in excluded]
+        entries.append(
+            {
+                "path": "." if relative == Path(".") else relative.as_posix(),
+                "direct_file_count": sum(path.is_file() for path in children),
+                "direct_directory_count": sum(path.is_dir() for path in children),
+            }
+        )
+    return sorted(entries, key=lambda item: item["path"])
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--out", required=True)
 parser.add_argument("--started-at-ms", required=True, type=int)
@@ -65,6 +84,7 @@ lab_files = files_under(root, {".git", "meta-ontology-go", "generated", "receipt
 fixture_files = sorted(fixture_root.glob("*.gooo"))
 generated_files = files_under(root / "generated", {".git"})
 language_files = language_inventory(root, compiler_files, lab_files)
+lab_directories = directory_inventory(root, {".git", "meta-ontology-go", "generated", "receipts", "repair"})
 
 metrics = {
     "schema": "gooo/best-practice-corpus-metrics/v1",
@@ -90,11 +110,8 @@ metrics = {
     "language_go_physical_lines": sum(item["physical_lines"] for item in language_files if item["language"] == "go"),
     "language_gooo_files": sum(item["language"] == "gooo" for item in language_files),
     "language_gooo_physical_lines": sum(item["physical_lines"] for item in language_files if item["language"] == "gooo"),
-    "lab_descendant_dirs": sum(
-        1
-        for path in root.rglob("*")
-        if path.is_dir() and ".git" not in path.parts and path.name not in {"meta-ontology-go", "generated", "receipts", "repair"}
-    ),
+    "lab_directory_inventory": lab_directories,
+    "lab_descendant_dirs": len(lab_directories) - 1,
 }
 
 output = Path(args.out)
@@ -102,9 +119,13 @@ output.parent.mkdir(parents=True, exist_ok=True)
 output.write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n")
 print("### Corpus metrics")
 for key, value in metrics.items():
-    if key not in {"schema", "language_file_inventory"}:
+    if key not in {"schema", "language_file_inventory", "lab_directory_inventory"}:
         print(f"- {key}: `{value}`")
 print("### Language file inventory")
 for item in language_files:
     if item["language"] == "gooo":
         print(f"- {item['scope']}/{item['path']}: `{item['language']}` `{item['physical_lines']}` physical lines")
+print("### Directory inventory")
+for item in lab_directories:
+    if item["path"] == "." or "/" not in item["path"]:
+        print(f"- {item['path']}: `{item['direct_file_count']}` direct files, `{item['direct_directory_count']}` direct directories")
