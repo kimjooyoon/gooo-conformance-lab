@@ -17,4 +17,4 @@ if len(sys.argv) != 2 or sys.argv[1] not in cases:
 case = cases[sys.argv[1]]
 if case.get("generation") not in {"PASS", "FAIL_CLOSED"}:
     raise SystemExit("unsupported best-practice generation state")
-print(case["generation"], case["root"], case["target"], case["entity_count"], case["activity_count"])
+print(case["generation"], case["root"], case["target"], case["entity_count"], case["activity_count"], case["bind_count"])

@@ -62,7 +62,7 @@ jobs:
           for source in fixtures/best-practices/*.gooo; do
             (
               name="$(basename "$source" .gooo)"
-              read -r generation root target entity_count activity_count < <(python3 ci/catalog_case.py "$name")
+              read -r generation root target entity_count activity_count bind_count < <(python3 ci/catalog_case.py "$name")
               set +e
               (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"
               generation_status=$?
@@ -79,7 +79,7 @@ jobs:
                 echo "generation failed for $source" >&2
                 exit 1
               fi
-              python3 ci/verify_gooo_generate.py "receipts/$name.json" "$source" "$entity_count" "$activity_count"
+              python3 ci/verify_gooo_generate.py "receipts/$name.json" "$source" "$entity_count" "$activity_count" "$bind_count"
               test -n "$(find "generated/$name" -type f -name '*.go' -print -quit)"
               fi
               if ! (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"; then

@@ -67,6 +67,7 @@ for case in catalog["cases"]:
             "query_state": "CLOSED",
             "entity_count": case["entity_count"],
             "activity_count": case["activity_count"],
+            "bind_count": case["bind_count"],
             "source_digest": digest(source),
             "generation_receipt_digest": digest(generation_receipt),
             "query_receipt_digest": digest(query_receipt),
