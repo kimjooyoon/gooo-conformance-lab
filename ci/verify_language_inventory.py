@@ -55,4 +55,21 @@ if metrics.get("compiler_gooo_files") != sum(item["language"] == "gooo" for item
 if metrics.get("compiler_gooo_physical_lines") != sum(item["physical_lines"] for item in compiler if item["language"] == "gooo"):
     raise SystemExit("compiler Gooo line count disagrees with inventory")
 
+directories = metrics.get("lab_directory_inventory")
+if not isinstance(directories, list) or not directories:
+    raise SystemExit("directory inventory is missing")
+directory_paths = [item.get("path") for item in directories]
+if directory_paths != sorted(directory_paths) or len(directory_paths) != len(set(directory_paths)):
+    raise SystemExit("directory inventory is not deterministic")
+for item in directories:
+    if not isinstance(item.get("direct_file_count"), int) or item["direct_file_count"] < 0:
+        raise SystemExit("directory inventory has an invalid file count")
+    if not isinstance(item.get("direct_directory_count"), int) or item["direct_directory_count"] < 0:
+        raise SystemExit("directory inventory has an invalid directory count")
+if sum(item["direct_file_count"] for item in directories) != metrics.get("lab_regular_files"):
+    raise SystemExit("directory file counts disagree with lab file count")
+if sum(item["direct_directory_count"] for item in directories) != metrics.get("lab_descendant_dirs"):
+    raise SystemExit("directory child counts disagree with lab directory count")
+
 print(f"verified deterministic language file inventory: {len(entries)} files")
+print(f"verified deterministic directory inventory: {len(directories)} directories")
