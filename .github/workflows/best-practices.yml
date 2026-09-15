@@ -68,8 +68,18 @@ jobs:
                 echo "runtime binding generation unexpectedly succeeded" >&2
                 exit 1
               fi
+              else
+              if ! (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"; then
+                cat "receipts/$name.json"
+                echo "generation failed for $source" >&2
+                exit 1
               fi
-              SOURCE_FILE="$source" python3 - <<'PY4'
+              python3 ci/verify_gooo_generate.py "receipts/$name.json"
+              test -n "$(find "generated/$name" -type f -name '*.go' -print -quit)"
+              fi
+              fi
+              if [ "$generation" = "FAIL_CLOSED" ]; then
+                SOURCE_FILE="$source" python3 - <<'PY4'
           import json
           import os
           from pathlib import Path
@@ -85,15 +95,6 @@ jobs:
               raise SystemExit(f"runtime binding generation boundary was not explicit for {source.name}")
           print(f"recorded expected runtime binding generation boundary for {source.name}")
           PY4
-              else
-              if ! (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"; then
-                cat "receipts/$name.json"
-                echo "generation failed for $source" >&2
-                exit 1
-              fi
-              python3 ci/verify_gooo_generate.py "receipts/$name.json"
-              test -n "$(find "generated/$name" -type f -name '*.go' -print -quit)"
-              fi
               fi
               if ! (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"; then
                 cat "receipts/$name-query.json"
