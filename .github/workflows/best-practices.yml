@@ -58,10 +58,12 @@ jobs:
           print(f"catalog covers {len(actual)} .gooo fixtures")
           PY0
           count=0
+          pids=()
           for source in fixtures/best-practices/*.gooo; do
-            name="$(basename "$source" .gooo)"
-            read -r generation root target < <(python3 ci/catalog_case.py "$name")
-            if [ "$generation" = "FAIL_CLOSED" ]; then
+            (
+              name="$(basename "$source" .gooo)"
+              read -r generation root target < <(python3 ci/catalog_case.py "$name")
+              if [ "$generation" = "FAIL_CLOSED" ]; then
               if (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"; then
                 echo "runtime binding generation unexpectedly succeeded" >&2
                 exit 1
@@ -82,7 +84,7 @@ jobs:
               raise SystemExit(f"runtime binding generation boundary was not explicit for {source.name}")
           print(f"recorded expected runtime binding generation boundary for {source.name}")
           PY4
-            else
+              else
               if ! (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"; then
                 cat "receipts/$name.json"
                 echo "generation failed for $source" >&2
@@ -90,16 +92,20 @@ jobs:
               fi
               python3 ci/verify_gooo_generate.py "receipts/$name.json"
               test -n "$(find "generated/$name" -type f -name '*.go' -print -quit)"
-            fi
-            if ! (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"; then
-              cat "receipts/$name-query.json"
-              echo "query failed for $source" >&2
-              exit 1
-            fi
-            python3 ci/verify_gooo_query_case.py "receipts/$name-query.json" "$root" "$target"
-            count=$((count + 1))
+              fi
+              fi
+              if ! (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"; then
+                cat "receipts/$name-query.json"
+                echo "query failed for $source" >&2
+                exit 1
+              fi
+              python3 ci/verify_gooo_query_case.py "receipts/$name-query.json" "$root" "$target"
+            ) &
+            pids+=("$!")
           done
+          for pid in "${pids[@]}"; do wait "$pid"; done
           expected_count="$(python3 ci/catalog_case.py --count)"
+          count="$(find receipts -maxdepth 1 -type f -name '*-query.json' -print | wc -l | tr -d ' ')"
           test "$count" -eq "$expected_count"
           generation_query_wall_ms=$(( $(date +%s%3N) - started_at_ms ))
           printf 'module gooo.generated\n\ngo 1.27\n' > generated/go.mod
