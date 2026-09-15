@@ -1,0 +1,10 @@
+package incidentresolutionboundary
+namespace incidentresolutionboundary
+
+entity Incident id "incident-boundary://entity/incident"
+entity Resolution id "incident-boundary://entity/resolution"
+
+activity ObserveIncident(Incident) -> Incident computes "incident.observe:incident"
+activity ProposeResolution(Incident) -> Resolution computes "incident.propose:resolution"
+
+bind ObserveIncident.result -> ProposeResolution.input
