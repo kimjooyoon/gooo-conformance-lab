@@ -46,6 +46,10 @@ The compiler observes the declared relationships and the CI observes the
 generated/query results. It does not claim that these declarations execute a
 warehouse, deploy a service, or approve a repair by themselves.
 
+The corpus contract is declared in `catalog.json`. CI reads that catalog for
+each source file's expected generation state and semantic query coordinates;
+adding a fixture therefore extends data before it extends workflow logic.
+
 The self-improvement fixture is deliberately incomplete as an automation
 promise: candidate generation, independent evaluation, adoption, and the next
 run are separate operations. The fixture only makes their semantic boundary

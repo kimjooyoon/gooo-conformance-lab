@@ -43,10 +43,24 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p generated receipts
+          python3 - <<'PY0'
+          import json
+          from pathlib import Path
+
+          catalog = json.loads(Path("fixtures/best-practices/catalog.json").read_text())
+          if catalog.get("schema") != "gooo/best-practice-corpus/v1":
+              raise SystemExit("unexpected best-practice catalog schema")
+          listed = sorted(item.get("source", "") for item in catalog.get("cases", []))
+          actual = sorted(path.name for path in Path("fixtures/best-practices").glob("*.gooo"))
+          if listed != actual or len({item.get("id") for item in catalog.get("cases", [])}) != len(listed):
+              raise SystemExit("best-practice catalog does not exactly cover the .gooo corpus")
+          print(f"catalog covers {len(actual)} .gooo fixtures")
+          PY0
           count=0
           for source in fixtures/best-practices/*.gooo; do
             name="$(basename "$source" .gooo)"
-            if [ "$name" = "10-runtime-chain" ] || [ "$name" = "11-repair-frontier" ] || [ "$name" = "13-domain-binding-boundary" ]; then
+            read -r generation root target < <(python3 ci/catalog_case.py "$name")
+            if [ "$generation" = "FAIL_CLOSED" ]; then
               if (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"; then
                 echo "runtime binding generation unexpectedly succeeded" >&2
                 exit 1
@@ -76,22 +90,6 @@ jobs:
               python3 ci/verify_gooo_generate.py "receipts/$name.json"
               test -n "$(find "generated/$name" -type f -name '*.go' -print -quit)"
             fi
-            case "$name" in
-              01-domain-model) root="billing://activity/pay-order"; target="billing://entity/order" ;;
-              02-provenance-chain) root="delivery://activity/build-artifact"; target="delivery://entity/request" ;;
-              03-bounded-change) root="evolution://activity/compare-candidate"; target="evolution://entity/candidate" ;;
-              04-inventory-consistency) root="inventory://activity/reconcile-stock"; target="inventory://entity/order-line" ;;
-              05-deployment-contract) root="platform://activity/validate-deployment"; target="platform://entity/service-contract" ;;
-              06-change-review) root="governance://activity/review-repair"; target="governance://entity/problem-report" ;;
-              07-self-improvement-loop) root="evolution://activity/observe-problem"; target="evolution://entity/observed-problem" ;;
-              08-counterexample-guided-repair) root="repair://activity/observe-failure"; target="repair://entity/failure-observation" ;;
-              09-runtime-plan) root="runtime://activity/process"; target="runtime://entity/integer" ;;
-              10-runtime-chain) root="runtimechain://activity/produce"; target="runtime-chain://entity/integer" ;;
-              11-repair-frontier) root="repairfrontier://activity/observe-failure"; target="repair://entity/failure" ;;
-              12-domain-problem-resolution) root="problemresolution://activity/describe-problem"; target="domain://entity/problem" ;;
-              13-domain-binding-boundary) root="problemresolutionboundary://activity/observe-problem"; target="domain-boundary://entity/problem" ;;
-              *) echo "unknown best-practice fixture: $name" >&2; exit 1 ;;
-            esac
             if ! (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"; then
               cat "receipts/$name-query.json"
               echo "query failed for $source" >&2
@@ -100,7 +98,8 @@ jobs:
             python3 ci/verify_gooo_query_case.py "receipts/$name-query.json" "$root" "$target"
             count=$((count + 1))
           done
-          test "$count" -eq 13
+          expected_count="$(python3 ci/catalog_case.py --count)"
+          test "$count" -eq "$expected_count"
           if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
             --entry Process \
             --input ../fixtures/best-practices/run-input.json \
