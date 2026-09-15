@@ -52,12 +52,18 @@ for case in catalog["cases"]:
         )
     if not generation_ok:
         raise SystemExit(f"generation receipt did not match catalog state for {case['id']}")
+    generation_reason = (
+        "GENERATION_SUCCESS"
+        if case["generation"] == "PASS"
+        else "RUNTIME_BINDINGS_UNSUPPORTED"
+    )
     observations.append(
         {
             "case_id": case["id"],
             "source": case["source"],
             "state": "CLOSED" if case["generation"] == "PASS" else "FAIL_CLOSED",
             "generation_state": case["generation"],
+            "generation_reason": generation_reason,
             "query_state": "CLOSED",
             "source_digest": digest(source),
             "generation_receipt_digest": digest(generation_receipt),
