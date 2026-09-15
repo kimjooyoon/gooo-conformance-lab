@@ -1,0 +1,10 @@
+package infrastructurecontract
+namespace infrastructurecontract
+
+entity ServiceContract id "infra://entity/service-contract"
+entity DeploymentPlan id "infra://entity/deployment-plan"
+entity ValidationResult id "infra://entity/validation-result"
+
+activity DeclareContract(ServiceContract) -> ServiceContract computes "infra.declare:service-contract"
+activity ValidatePlan(DeploymentPlan) -> ValidationResult computes "infra.validate:deployment-plan"
+activity RecordValidation(ValidationResult) -> ValidationResult computes "infra.record:validation"

@@ -14,5 +14,6 @@
     {"id": "11-repair-frontier", "source": "11-repair-frontier.gooo", "generation": "FAIL_CLOSED", "root": "repairfrontier://activity/observe-failure", "target": "repair://entity/failure"},
     {"id": "12-domain-problem-resolution", "source": "12-domain-problem-resolution.gooo", "generation": "PASS", "root": "problemresolution://activity/describe-problem", "target": "domain://entity/problem"},
     {"id": "13-domain-binding-boundary", "source": "13-domain-binding-boundary.gooo", "generation": "FAIL_CLOSED", "root": "problemresolutionboundary://activity/observe-problem", "target": "domain-boundary://entity/problem"}
+    ,{"id": "14-infrastructure-contract", "source": "14-infrastructure-contract.gooo", "generation": "PASS", "root": "infrastructurecontract://activity/declare-contract", "target": "infra://entity/service-contract"}
   ]
 }

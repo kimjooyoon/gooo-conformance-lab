@@ -41,6 +41,8 @@ small problem-solving scenarios that use the same shape:
 - domain binding boundary: preserve a typed domain bind as a queryable
   declaration while CI records the current generation boundary as explicit
   `FAIL_CLOSED` evidence.
+- infrastructure contract: declare a service contract, a deployment plan, and
+  a validation result as separate operational domain concepts.
 
 The compiler observes the declared relationships and the CI observes the
 generated/query results. It does not claim that these declarations execute a
