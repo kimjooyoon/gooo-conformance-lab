@@ -1,0 +1,17 @@
+package localproject
+
+namespace localproject
+
+entity Workspace id "local-project://entity/workspace"
+entity WorkItem id "local-project://entity/work-item"
+entity Dependency id "local-project://entity/dependency"
+entity Observation id "local-project://entity/observation"
+entity Resolution id "local-project://entity/resolution"
+entity Decision id "local-project://entity/decision"
+
+activity DefineWorkspace(Workspace) -> Workspace computes "local-project:define"
+activity DeclareWorkItem(Workspace) -> WorkItem computes "local-project:declare"
+activity RelateDependency(WorkItem) -> Dependency computes "local-project:relate"
+activity ObserveBlocker(Dependency) -> Observation computes "local-project:observe"
+activity ResolveBlocker(Observation) -> Resolution computes "local-project:resolve"
+activity RecordDecision(Resolution) -> Decision computes "local-project:decide"
