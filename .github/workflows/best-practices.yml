@@ -85,7 +85,7 @@ jobs:
               08-counterexample-guided-repair) root="repair://activity/observe-failure"; target="repair://entity/failure-observation" ;;
               09-runtime-plan) root="runtime://activity/process"; target="runtime://entity/integer" ;;
               10-runtime-chain) root="runtimechain://activity/produce"; target="runtime-chain://entity/integer" ;;
-              11-repair-frontier) root="repair://activity/observe-failure"; target="repair://entity/failure" ;;
+              11-repair-frontier) root="repairfrontier://activity/observe-failure"; target="repair://entity/failure" ;;
               *) echo "unknown best-practice fixture: $name" >&2; exit 1 ;;
             esac
             if ! (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"; then
