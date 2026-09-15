@@ -51,6 +51,8 @@ small problem-solving scenarios that use the same shape:
   observe its result, and record a decision as a replayable domain trail.
 - incident resolution boundary: preserve a typed incident-to-resolution bind
   while the current runtime boundary records generation as `FAIL_CLOSED`.
+- evidence ledger: keep a domain claim, its observation, counterexample,
+  alternative, decision, and next operation as separate inspectable concepts.
 
 The compiler observes the declared relationships and the CI observes the
 generated/query results. It does not claim that these declarations execute a
