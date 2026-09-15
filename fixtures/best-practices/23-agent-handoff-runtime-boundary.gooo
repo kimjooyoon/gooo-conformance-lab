@@ -1,0 +1,10 @@
+package agenthandoffboundary
+namespace agenthandoffboundary
+
+entity Candidate id "agent-handoff-boundary://entity/candidate"
+entity Review id "agent-handoff-boundary://entity/review"
+
+activity ProposeCandidate(Candidate) -> Candidate computes "agent.handoff:propose"
+activity RecordIndependentReview(Candidate) -> Review computes "agent.handoff:review"
+
+bind ProposeCandidate.result -> RecordIndependentReview.input
