@@ -25,10 +25,17 @@ small problem-solving scenarios that use the same shape:
 - inventory consistency: reconcile an order line with a stock snapshot;
 - deployment contract: validate a plan against a service contract;
 - change review: review a repair candidate against a reported problem.
+- self-improvement loop: observe a problem, compare a repair candidate with a
+  baseline, and record a human decision.
 
 The compiler observes the declared relationships and the CI observes the
 generated/query results. It does not claim that these declarations execute a
 warehouse, deploy a service, or approve a repair by themselves.
+
+The self-improvement fixture is deliberately incomplete as an automation
+promise: candidate generation, independent evaluation, adoption, and the next
+run are separate operations. The fixture only makes their semantic boundary
+observable.
 
 The examples intentionally stop at the language boundary. Execution evidence,
 human decisions, repository writes, and release promotion remain separate

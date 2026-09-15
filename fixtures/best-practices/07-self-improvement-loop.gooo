@@ -1,0 +1,10 @@
+package evolution
+namespace evolution
+
+entity ObservedProblem id "evolution://entity/observed-problem"
+entity RepairCandidate id "evolution://entity/repair-candidate"
+entity BaselineResult id "evolution://entity/baseline-result"
+entity HumanDecision id "evolution://entity/human-decision"
+
+activity ObserveProblem(ObservedProblem) -> RepairCandidate
+activity CompareRepair(RepairCandidate, BaselineResult) -> HumanDecision
