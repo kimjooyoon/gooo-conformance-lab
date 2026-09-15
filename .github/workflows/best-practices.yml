@@ -68,7 +68,8 @@ jobs:
                 echo "runtime binding generation unexpectedly succeeded" >&2
                 exit 1
               fi
-          SOURCE_FILE="$source" python3 - <<'PY4'
+              fi
+              SOURCE_FILE="$source" python3 - <<'PY4'
           import json
           import os
           from pathlib import Path
