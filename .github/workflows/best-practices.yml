@@ -100,6 +100,9 @@ jobs:
           done
           expected_count="$(python3 ci/catalog_case.py --count)"
           test "$count" -eq "$expected_count"
+          printf 'module gooo.generated\n\ngo 1.27\n' > generated/go.mod
+          (cd generated && go test ./...)
+          echo "Verified generated Go compilation for the PASS corpus." >> "$GITHUB_STEP_SUMMARY"
           if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
             --entry Process \
             --input ../fixtures/best-practices/run-input.json \
