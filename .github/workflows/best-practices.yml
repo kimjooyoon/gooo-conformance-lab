@@ -275,6 +275,15 @@ jobs:
           cmp receipts/domain-index.json receipts/domain-index-replay.json
           echo "Verified deterministic domain index replay." >> "$GITHUB_STEP_SUMMARY"
           rm receipts/domain-index-replay.json
+          python3 ci/select_next_domain_case.py \
+            --index receipts/domain-index.json \
+            --out receipts/next-domain-operation.json | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 ci/select_next_domain_case.py \
+            --index receipts/domain-index.json \
+            --out receipts/next-domain-operation-replay.json >/dev/null
+          cmp receipts/next-domain-operation.json receipts/next-domain-operation-replay.json
+          echo "Verified deterministic next-domain-operation replay." >> "$GITHUB_STEP_SUMMARY"
+          rm receipts/next-domain-operation-replay.json
           echo "Verified $count executable .gooo best-practice fixtures." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload generated corpus receipt
