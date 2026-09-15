@@ -71,7 +71,7 @@ jobs:
           )
 
           func main() {
-              proposalData, err := os.ReadFile("proposal/adoption-proposal.json")
+              proposalData, err := os.ReadFile("../proposal/adoption-proposal.json")
               if err != nil { panic(err) }
               var proposal generation.SemanticAdoptionProposal
               if err := json.Unmarshal(proposalData, &proposal); err != nil { panic(err) }
@@ -92,7 +92,7 @@ jobs:
               }
               data, err := json.MarshalIndent(authorization, "", "  ")
               if err != nil { panic(err) }
-              if err := os.WriteFile("authorization/explicit.json", append(data, '\n'), 0644); err != nil { panic(err) }
+              if err := os.WriteFile("../authorization/explicit.json", append(data, '\n'), 0644); err != nil { panic(err) }
               fmt.Println("created compiler-bound explicit authorization")
           }
           GO
