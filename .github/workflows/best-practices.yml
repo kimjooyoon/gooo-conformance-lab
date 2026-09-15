@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 env:
-  GOOO_REF: 9a733fa335c2b4c3cb24e094caecc731e387a367
+  GOOO_REF: 1c384f2fe99589b0c5e3b95a422ba79c953cf7a9
 
 jobs:
   execute-corpus:
@@ -151,6 +151,27 @@ jobs:
           print("verified bound Gooo runtime chain")
           print("verified deterministic runtime provenance replay")
           PY3
+          if ! (cd meta-ontology-go && go run ./cmd/gooo compare --json \
+            ../receipts/runtime-chain.json \
+            ../receipts/runtime-chain-replay.json) > receipts/runtime-chain-comparison.json; then
+            cat receipts/runtime-chain-comparison.json
+            exit 1
+          fi
+          python3 - <<'PY4'
+          import json
+          from pathlib import Path
+
+          comparison = json.loads(Path("receipts/runtime-chain-comparison.json").read_text())
+          if comparison.get("schema") != "gooo/value-execution-replay-comparison/v1":
+              raise SystemExit("unexpected replay comparison schema")
+          if comparison.get("state") != "CLOSED":
+              raise SystemExit("runtime replay comparison did not close")
+          if comparison.get("reason") != "DETERMINISTIC_REPLAY":
+              raise SystemExit("runtime replay comparison reason was not explicit")
+          if not all(comparison.get(field) for field in ("same_plan", "same_input", "same_execution")):
+              raise SystemExit("runtime replay comparison did not preserve identity")
+          print("verified compiler replay comparison boundary")
+          PY4
           echo "Verified $count executable .gooo best-practice fixtures." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload generated corpus receipt
