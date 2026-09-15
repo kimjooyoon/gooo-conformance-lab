@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 env:
-  GOOO_REF: 7840eb793b11486af0269d7c8e4518f9c655061c
+  GOOO_REF: 060f9008e9a0c1441af8da12e72e593a049bccca
 
 jobs:
   execute-corpus:
@@ -201,6 +201,27 @@ jobs:
               raise SystemExit("tampered runtime receipt did not expose repair frontier")
           print("verified fail-closed runtime receipt integrity boundary")
           PY6
+          mkdir -p repair
+          (cd meta-ontology-go && go run ./cmd/gooo propose-repair \
+            ../receipts/runtime-chain-tampered-comparison.json \
+            --out ../repair)
+          python3 - <<'PY7'
+          import json
+          from pathlib import Path
+
+          repair = json.loads(Path("repair/repair-candidate.json").read_text())
+          if repair.get("schema") != "gooo/value-execution-repair-candidate/v1":
+              raise SystemExit("unexpected repair candidate schema")
+          if repair.get("trigger_state") != "REFUTED":
+              raise SystemExit("repair candidate trigger was not refuted")
+          if repair.get("execution_allowed") is not False:
+              raise SystemExit("repair candidate unexpectedly grants execution")
+          if repair.get("repository_writes") != 0:
+              raise SystemExit("repair candidate unexpectedly grants repository writes")
+          if repair.get("next_operation") != "PRESERVE_COUNTEREXAMPLE_AND_OPEN_REPAIR_CANDIDATE":
+              raise SystemExit("repair candidate lost next operation")
+          print("verified non-executing repair candidate from runtime refutation")
+          PY7
           echo "Verified $count executable .gooo best-practice fixtures." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload generated corpus receipt
