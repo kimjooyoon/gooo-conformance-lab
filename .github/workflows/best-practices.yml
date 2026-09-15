@@ -60,6 +60,23 @@ jobs:
             count=$((count + 1))
           done
           test "$count" -eq 8
+          (cd meta-ontology-go && go run ./cmd/gooo run --json \
+            --entry PayOrder \
+            --input ../fixtures/best-practices/run-input.json \
+            ../fixtures/best-practices/01-domain-model.gooo) > receipts/runtime.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          runtime = json.loads(Path("receipts/runtime.json").read_text())
+          if runtime.get("schema") != "gooo/value-execution-plan/v1":
+              raise SystemExit("unexpected runtime receipt schema")
+          if runtime.get("decision") != "PASS":
+              raise SystemExit("Gooo runtime did not pass the value plan")
+          if not runtime.get("execution", {}).get("activities"):
+              raise SystemExit("runtime receipt contains no executed activity")
+          print("verified Gooo value execution plan")
+          PY
           echo "Verified $count executable .gooo best-practice fixtures." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload generated corpus receipt
