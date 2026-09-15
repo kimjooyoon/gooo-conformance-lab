@@ -44,6 +44,14 @@ jobs:
             (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"
             python3 ci/verify_gooo_generate.py "receipts/$name.json"
             test -n "$(find "generated/$name" -type f -name '*.go' -print -quit)"
+            case "$name" in
+              01-domain-model) root="billing://activity/pay-order"; target="billing://entity/order" ;;
+              02-provenance-chain) root="delivery://activity/build-artifact"; target="delivery://entity/request" ;;
+              03-bounded-change) root="evolution://activity/compare-candidate"; target="evolution://entity/candidate" ;;
+              *) echo "unknown best-practice fixture: $name" >&2; exit 1 ;;
+            esac
+            (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"
+            python3 ci/verify_gooo_query_case.py "receipts/$name-query.json" "$root" "$target"
             count=$((count + 1))
           done
           test "$count" -eq 3

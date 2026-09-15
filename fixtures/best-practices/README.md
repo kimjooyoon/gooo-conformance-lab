@@ -2,8 +2,8 @@
 
 These fixtures are intentionally small and executable. The public conformance
 workflow runs the pinned Gooo compiler against every file and verifies the
-generated response. They are not pseudocode and they do not claim that the
-whole language is complete.
+generated response and a deterministic semantic query. They are not pseudocode
+and they do not claim that the whole language is complete.
 
 ## Practices represented
 
@@ -14,6 +14,8 @@ whole language is complete.
 4. Prefer several small declarations over one opaque natural-language claim.
 5. Treat generated Go as an artifact to inspect, not as permission to adopt a
    change.
+6. Query the declared input relation instead of inferring it from the source
+   text or from the generated file name.
 
 The examples intentionally stop at the language boundary. Execution evidence,
 human decisions, repository writes, and release promotion remain separate
