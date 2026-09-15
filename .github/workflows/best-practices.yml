@@ -122,6 +122,7 @@ jobs:
               raise SystemExit("runtime receipt contains no executed activity")
           print("verified Gooo value execution plan")
           PY2
+          python3 ci/verify_runtime_value.py receipts/runtime.json
           if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
             --entry Produce \
             --input ../fixtures/best-practices/run-input.json \
