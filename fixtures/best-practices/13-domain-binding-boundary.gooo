@@ -1,0 +1,10 @@
+package problemresolutionboundary
+namespace problemresolutionboundary
+
+entity Problem id "domain-boundary://entity/problem"
+entity Resolution id "domain-boundary://entity/resolution"
+
+activity ObserveProblem(Problem) -> Problem computes "domain.observe:problem"
+activity ProposeResolution(Problem) -> Resolution computes "domain.propose:resolution"
+
+bind ObserveProblem.result -> ProposeResolution.input

@@ -46,24 +46,26 @@ jobs:
           count=0
           for source in fixtures/best-practices/*.gooo; do
             name="$(basename "$source" .gooo)"
-            if [ "$name" = "10-runtime-chain" ] || [ "$name" = "11-repair-frontier" ]; then
+            if [ "$name" = "10-runtime-chain" ] || [ "$name" = "11-repair-frontier" ] || [ "$name" = "13-domain-binding-boundary" ]; then
               if (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"; then
                 echo "runtime binding generation unexpectedly succeeded" >&2
                 exit 1
               fi
-              python3 - <<'PY4'
+          SOURCE_FILE="$source" python3 - <<'PY4'
           import json
+          import os
           from pathlib import Path
 
-          receipt = json.loads(Path("receipts/10-runtime-chain.json").read_text())
+          source = Path(os.environ["SOURCE_FILE"])
+          receipt = json.loads((Path("receipts") / (source.stem + ".json")).read_text())
           diagnostics = receipt.get("diagnostics", [])
           if receipt.get("status") != "error" or not any(
               item.get("code") == "generator.generate"
               and "runtime bindings are unsupported" in item.get("message", "")
               for item in diagnostics
           ):
-              raise SystemExit("runtime binding generation boundary was not explicit")
-          print("recorded expected runtime binding generation boundary")
+              raise SystemExit(f"runtime binding generation boundary was not explicit for {source.name}")
+          print(f"recorded expected runtime binding generation boundary for {source.name}")
           PY4
             else
               if ! (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"; then
@@ -87,6 +89,7 @@ jobs:
               10-runtime-chain) root="runtimechain://activity/produce"; target="runtime-chain://entity/integer" ;;
               11-repair-frontier) root="repairfrontier://activity/observe-failure"; target="repair://entity/failure" ;;
               12-domain-problem-resolution) root="problemresolution://activity/describe-problem"; target="domain://entity/problem" ;;
+              13-domain-binding-boundary) root="problemresolutionboundary://activity/observe-problem"; target="domain-boundary://entity/problem" ;;
               *) echo "unknown best-practice fixture: $name" >&2; exit 1 ;;
             esac
             if ! (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"; then
@@ -97,7 +100,7 @@ jobs:
             python3 ci/verify_gooo_query_case.py "receipts/$name-query.json" "$root" "$target"
             count=$((count + 1))
           done
-          test "$count" -eq 12
+          test "$count" -eq 13
           if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
             --entry Process \
             --input ../fixtures/best-practices/run-input.json \

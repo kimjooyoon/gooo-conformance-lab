@@ -38,6 +38,9 @@ small problem-solving scenarios that use the same shape:
   edge and verify deterministic activity order plus one result delivery.
 - domain problem resolution: describe a domain problem, propose a resolution,
   and record a decision while preserving the causal bind edges.
+- domain binding boundary: preserve a typed domain bind as a queryable
+  declaration while CI records the current generation boundary as explicit
+  `FAIL_CLOSED` evidence.
 
 The compiler observes the declared relationships and the CI observes the
 generated/query results. It does not claim that these declarations execute a
