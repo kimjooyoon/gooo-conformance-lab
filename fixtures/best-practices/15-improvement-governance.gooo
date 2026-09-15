@@ -1,0 +1,12 @@
+package improvementgovernance
+namespace improvementgovernance
+
+entity MetricObservation id "self-improvement://entity/metric"
+entity ImprovementCandidate id "self-improvement://entity/candidate"
+entity IndependentReview id "self-improvement://entity/review"
+entity AdoptionDecision id "self-improvement://entity/adoption"
+
+activity CaptureMetric(MetricObservation) -> MetricObservation computes "improvement.capture:metric"
+activity PreserveCandidate(ImprovementCandidate) -> ImprovementCandidate computes "improvement.preserve:candidate"
+activity ReviewCandidate(IndependentReview) -> IndependentReview computes "improvement.review:candidate"
+activity DecideAdoption(AdoptionDecision) -> AdoptionDecision computes "improvement.decide:adoption"

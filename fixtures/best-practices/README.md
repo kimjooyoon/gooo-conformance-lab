@@ -43,6 +43,8 @@ small problem-solving scenarios that use the same shape:
   `FAIL_CLOSED` evidence.
 - infrastructure contract: declare a service contract, a deployment plan, and
   a validation result as separate operational domain concepts.
+- improvement governance: declare metric observation, candidate preservation,
+  independent review, and adoption decision as separate concepts.
 
 The compiler observes the declared relationships and the CI observes the
 generated/query results. It does not claim that these declarations execute a
