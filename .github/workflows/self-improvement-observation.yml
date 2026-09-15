@@ -80,26 +80,18 @@ jobs:
           )
           print("verified bounded observation and proposal-only adoption boundary")
           PY
-          (cd meta-ontology-go && go run ./cmd/gooo adopt \
+          if (cd meta-ontology-go && go run ./cmd/gooo adopt \
             ../fixtures/self-improvement-observation/observation.gooo \
             --input ../fixtures/self-improvement-observation/input.gooo \
             --observation ../observation/compiler-observation.json \
             --proposal ../proposal/adoption-proposal.json \
             --authorization ../authorization/denied.json \
-            --out ../adoption)
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-
-          report = json.loads(Path("adoption/adoption-result.json").read_text())
-          if report.get("independent_decision") != "UNKNOWN":
-              raise SystemExit("denied authorization was not classified UNKNOWN")
-          if report.get("independent_reason") != "MISSING_EXPLICIT_AUTHORIZATION":
-              raise SystemExit("denied authorization has the wrong reason")
-          if report.get("repository_writes") != 0 or report.get("local_test_executions") != 0:
-              raise SystemExit("denied adoption performed a forbidden effect")
-          print("verified fail-closed denied adoption")
-          PY
+            --out ../adoption); then
+            echo "invalid authorization was accepted" >&2
+            exit 1
+          fi
+          test ! -e adoption/adoption-result.json
+          echo "verified fail-closed invalid authorization without adoption fallback"
           echo "Verified bounded observation and proposal-only adoption boundary." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload observation and proposal receipts
