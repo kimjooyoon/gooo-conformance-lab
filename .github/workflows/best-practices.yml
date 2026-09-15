@@ -41,11 +41,11 @@ jobs:
           count=0
           for source in fixtures/best-practices/*.gooo; do
             name="$(basename "$source" .gooo)"
-  if ! (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"; then
-    cat "receipts/$name.json"
-    echo "generation failed for $source" >&2
-    exit 1
-  fi
+            if ! (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"; then
+              cat "receipts/$name.json"
+              echo "generation failed for $source" >&2
+              exit 1
+            fi
             python3 ci/verify_gooo_generate.py "receipts/$name.json"
             test -n "$(find "generated/$name" -type f -name '*.go' -print -quit)"
             case "$name" in
@@ -61,11 +61,11 @@ jobs:
               10-runtime-chain) root="runtime-chain://activity/produce"; target="runtime-chain://entity/integer" ;;
               *) echo "unknown best-practice fixture: $name" >&2; exit 1 ;;
             esac
-  if ! (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"; then
-    cat "receipts/$name-query.json"
-    echo "query failed for $source" >&2
-    exit 1
-  fi
+            if ! (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"; then
+              cat "receipts/$name-query.json"
+              echo "query failed for $source" >&2
+              exit 1
+            fi
             python3 ci/verify_gooo_query_case.py "receipts/$name-query.json" "$root" "$target"
             count=$((count + 1))
           done
@@ -77,7 +77,7 @@ jobs:
             cat receipts/runtime.json
             exit 1
           fi
-          python3 - <<'PY'
+          python3 - <<'PY2'
           import json
           from pathlib import Path
 
@@ -89,11 +89,15 @@ jobs:
           if not runtime.get("execution", {}).get("activities"):
               raise SystemExit("runtime receipt contains no executed activity")
           print("verified Gooo value execution plan")
-          (cd meta-ontology-go && go run ./cmd/gooo run --json \
+          PY2
+          if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
             --entry Produce \
             --input ../fixtures/best-practices/run-input.json \
-            ../fixtures/best-practices/10-runtime-chain.gooo) > receipts/runtime-chain.json
-          python3 - <<'PY'
+            ../fixtures/best-practices/10-runtime-chain.gooo) > receipts/runtime-chain.json; then
+            cat receipts/runtime-chain.json
+            exit 1
+          fi
+          python3 - <<'PY3'
           import json
           from pathlib import Path
 
@@ -106,8 +110,7 @@ jobs:
           if execution.get("deliveries") != 1:
               raise SystemExit("runtime chain did not deliver one bound result")
           print("verified bound Gooo runtime chain")
-          PY
-          PY
+          PY3
           echo "Verified $count executable .gooo best-practice fixtures." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload generated corpus receipt
