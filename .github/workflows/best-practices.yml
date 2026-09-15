@@ -86,6 +86,7 @@ jobs:
               09-runtime-plan) root="runtime://activity/process"; target="runtime://entity/integer" ;;
               10-runtime-chain) root="runtimechain://activity/produce"; target="runtime-chain://entity/integer" ;;
               11-repair-frontier) root="repairfrontier://activity/observe-failure"; target="repair://entity/failure" ;;
+              12-domain-problem-resolution) root="problemresolution://activity/describe-problem"; target="domain://entity/problem" ;;
               *) echo "unknown best-practice fixture: $name" >&2; exit 1 ;;
             esac
             if ! (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"; then
@@ -96,7 +97,7 @@ jobs:
             python3 ci/verify_gooo_query_case.py "receipts/$name-query.json" "$root" "$target"
             count=$((count + 1))
           done
-          test "$count" -eq 11
+          test "$count" -eq 12
           if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
             --entry Process \
             --input ../fixtures/best-practices/run-input.json \
