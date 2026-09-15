@@ -1,0 +1,18 @@
+package domainmigrationboundary
+namespace domainmigrationboundary
+
+entity CurrentDomain id "domain-migration://entity/current-domain"
+entity TargetDomain id "domain-migration://entity/target-domain"
+entity MappingDecision id "domain-migration://entity/mapping-decision"
+entity CompatibilityFinding id "domain-migration://entity/compatibility-finding"
+entity MigrationPlan id "domain-migration://entity/migration-plan"
+entity VerificationRecord id "domain-migration://entity/verification-record"
+entity AdoptionDecision id "domain-migration://entity/adoption-decision"
+
+activity DescribeCurrentDomain(CurrentDomain) -> CurrentDomain computes "domain.migration:describe"
+activity DefineTargetDomain(CurrentDomain) -> TargetDomain computes "domain.migration:target"
+activity RecordMappingDecision(TargetDomain) -> MappingDecision computes "domain.migration:map"
+activity CaptureCompatibilityFinding(MappingDecision) -> CompatibilityFinding computes "domain.migration:compare"
+activity ProposeMigrationPlan(CompatibilityFinding) -> MigrationPlan computes "domain.migration:plan"
+activity RecordVerification(MigrationPlan) -> VerificationRecord computes "domain.migration:verify"
+activity RecordAdoptionDecision(VerificationRecord) -> AdoptionDecision computes "domain.migration:decide"
