@@ -1,0 +1,18 @@
+package compilerdiagnostictriage
+namespace compilerdiagnostictriage
+
+entity Diagnostic id "compiler-diagnostic://entity/diagnostic"
+entity Reproduction id "compiler-diagnostic://entity/reproduction"
+entity RootCause id "compiler-diagnostic://entity/root-cause"
+entity CandidateFix id "compiler-diagnostic://entity/candidate-fix"
+entity RegressionResult id "compiler-diagnostic://entity/regression-result"
+entity ReviewDecision id "compiler-diagnostic://entity/review-decision"
+entity NextInvestigation id "compiler-diagnostic://entity/next-investigation"
+
+activity CaptureDiagnostic(Diagnostic) -> Diagnostic computes "compiler.diagnostic:record"
+activity RecordReproduction(Diagnostic) -> Reproduction computes "compiler.diagnostic:reproduce"
+activity DescribeRootCause(Reproduction) -> RootCause computes "compiler.diagnostic:explain"
+activity ProposeCandidateFix(RootCause) -> CandidateFix computes "compiler.diagnostic:propose"
+activity RecordRegressionResult(CandidateFix) -> RegressionResult computes "compiler.diagnostic:regress"
+activity RecordReviewDecision(RegressionResult) -> ReviewDecision computes "compiler.diagnostic:decide"
+activity DefineNextInvestigation(ReviewDecision) -> NextInvestigation computes "compiler.diagnostic:resume"
