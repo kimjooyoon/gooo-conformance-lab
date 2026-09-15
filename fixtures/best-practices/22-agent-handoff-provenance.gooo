@@ -1,0 +1,18 @@
+package agenthandoff
+namespace agenthandoff
+
+entity WorkClaim id "agent-handoff://entity/work-claim"
+entity InputSnapshot id "agent-handoff://entity/input-snapshot"
+entity Candidate id "agent-handoff://entity/candidate"
+entity Review id "agent-handoff://entity/review"
+entity Decision id "agent-handoff://entity/decision"
+entity HandoffDossier id "agent-handoff://entity/handoff-dossier"
+entity NextOperation id "agent-handoff://entity/next-operation"
+
+activity DeclareWorkClaim(WorkClaim) -> WorkClaim computes "agent.handoff:claim"
+activity CaptureInputSnapshot(WorkClaim) -> InputSnapshot computes "agent.handoff:snapshot"
+activity ProposeCandidate(InputSnapshot) -> Candidate computes "agent.handoff:propose"
+activity RecordIndependentReview(Candidate) -> Review computes "agent.handoff:review"
+activity RecordDecision(Review) -> Decision computes "agent.handoff:decide"
+activity PublishHandoffDossier(Decision) -> HandoffDossier computes "agent.handoff:dossier"
+activity DefineNextOperation(HandoffDossier) -> NextOperation computes "agent.handoff:resume"
