@@ -36,6 +36,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: gooo-conformance-lab-${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   contract:
     name: Validate development story contract

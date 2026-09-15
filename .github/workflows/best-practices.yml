@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: gooo-conformance-lab-${{ github.workflow }}
+  cancel-in-progress: true
+
 env:
   GOOO_REF: 060f9008e9a0c1441af8da12e72e593a049bccca
 
@@ -31,7 +35,8 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.27.x'
-          cache: false
+          cache: true
+          cache-dependency-path: meta-ontology-go/go.sum
 
       - name: Generate and verify corpus
         shell: bash
