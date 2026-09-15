@@ -252,6 +252,10 @@ jobs:
           decision = json.loads(Path("receipts/improvement-decision.json").read_text())
           if decision.get("execution_allowed") is not False or decision.get("repository_writes") != 0:
               raise SystemExit("improvement decision unexpectedly grants execution authority")
+          if decision.get("decision") == "OBSERVED_IMPROVEMENT_CANDIDATE" and decision.get("review_required") is not True:
+              raise SystemExit("improvement candidate did not require independent review")
+          if not decision.get("comparison_digest", "").startswith("sha256:"):
+              raise SystemExit("improvement decision lost comparison identity")
           print("verified non-executing improvement decision")
           PY8
           wait "$domain_observation_pid"
