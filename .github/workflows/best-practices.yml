@@ -163,6 +163,7 @@ jobs:
           print("verified bound Gooo runtime chain")
           print("verified deterministic runtime provenance replay")
           PY3
+          python3 ci/verify_runtime_chain.py receipts/runtime-chain.json
           if ! (cd meta-ontology-go && go run ./cmd/gooo compare --json \
             ../receipts/runtime-chain.json \
             ../receipts/runtime-chain-replay.json) > receipts/runtime-chain-comparison.json; then
