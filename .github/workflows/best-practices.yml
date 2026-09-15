@@ -147,6 +147,15 @@ jobs:
             --candidate candidate/runtime.json \
             --candidate-source candidate/runtime-candidate.gooo \
             --out receipts/runtime-improvement-candidate.json
+          python3 ci/review_runtime_candidate.py \
+            --candidate receipts/runtime-improvement-candidate.json \
+            --out receipts/runtime-improvement-review.json
+          python3 ci/review_runtime_candidate.py \
+            --candidate receipts/runtime-improvement-candidate.json \
+            --out receipts/runtime-improvement-review-replay.json >/dev/null
+          cmp receipts/runtime-improvement-review.json receipts/runtime-improvement-review-replay.json
+          echo "Verified deterministic runtime candidate review replay." >> "$GITHUB_STEP_SUMMARY"
+          rm receipts/runtime-improvement-review-replay.json
           if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
             --entry Produce \
             --input ../fixtures/best-practices/run-input.json \
