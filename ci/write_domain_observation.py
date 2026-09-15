@@ -22,11 +22,43 @@ for case in catalog["cases"]:
     for evidence in (source, generation_receipt, query_receipt):
         if not evidence.is_file():
             raise SystemExit(f"missing observation evidence: {evidence}")
+    generation = json.loads(generation_receipt.read_text())
+    query = json.loads(query_receipt.read_text())
+    query_ok = (
+        query.get("schema") == "gooo-query/v1"
+        and query.get("status") == "ok"
+        and query.get("request", {}).get("operation") == "exact"
+        and query.get("request", {}).get("relation") == "used"
+        and bool(query.get("result", {}).get("deterministic_matches"))
+    )
+    if not query_ok:
+        raise SystemExit(f"query receipt did not close for {case['id']}")
+    if case["generation"] == "PASS":
+        generation_ok = (
+            generation.get("command") == "generate"
+            and generation.get("status") == "ok"
+            and bool(generation.get("output"))
+            and bool(generation.get("manifest"))
+        )
+    else:
+        generation_ok = (
+            generation.get("command") == "generate"
+            and generation.get("status") == "error"
+            and any(
+                item.get("code") == "generator.generate"
+                and "runtime bindings are unsupported" in item.get("message", "")
+                for item in generation.get("diagnostics", [])
+            )
+        )
+    if not generation_ok:
+        raise SystemExit(f"generation receipt did not match catalog state for {case['id']}")
     observations.append(
         {
             "case_id": case["id"],
             "source": case["source"],
-            "state": case["generation"],
+            "state": "CLOSED" if case["generation"] == "PASS" else "FAIL_CLOSED",
+            "generation_state": case["generation"],
+            "query_state": "CLOSED",
             "source_digest": digest(source),
             "generation_receipt_digest": digest(generation_receipt),
             "query_receipt_digest": digest(query_receipt),
