@@ -111,11 +111,7 @@ metrics = {
     "language_gooo_files": sum(item["language"] == "gooo" for item in language_files),
     "language_gooo_physical_lines": sum(item["physical_lines"] for item in language_files if item["language"] == "gooo"),
     "lab_directory_inventory": lab_directories,
-    "lab_descendant_dirs": sum(
-        1
-        for path in root.rglob("*")
-        if path.is_dir() and ".git" not in path.parts and path.name not in {"meta-ontology-go", "generated", "receipts", "repair"}
-    ),
+    "lab_descendant_dirs": len(lab_directories) - 1,
 }
 
 output = Path(args.out)
