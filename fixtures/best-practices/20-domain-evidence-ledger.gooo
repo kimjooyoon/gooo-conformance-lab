@@ -1,0 +1,16 @@
+package domainevidenceledger
+namespace domainevidenceledger
+
+entity Claim id "evidence-ledger://entity/claim"
+entity Observation id "evidence-ledger://entity/observation"
+entity Counterexample id "evidence-ledger://entity/counterexample"
+entity Alternative id "evidence-ledger://entity/alternative"
+entity Decision id "evidence-ledger://entity/decision"
+entity NextOperation id "evidence-ledger://entity/next-operation"
+
+activity DeclareClaim(Claim) -> Claim computes "evidence.ledger:declare"
+activity RecordObservation(Claim) -> Observation computes "evidence.ledger:observe"
+activity PreserveCounterexample(Observation) -> Counterexample computes "evidence.ledger:refute"
+activity ProposeAlternative(Counterexample) -> Alternative computes "evidence.ledger:adapt"
+activity RecordDecision(Alternative) -> Decision computes "evidence.ledger:decide"
+activity DefineNextOperation(Decision) -> NextOperation computes "evidence.ledger:resume"

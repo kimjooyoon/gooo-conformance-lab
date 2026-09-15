@@ -19,6 +19,7 @@
     {"id": "16-domain-counterexample-resolution", "source": "16-domain-counterexample-resolution.gooo", "generation": "PASS", "root": "domaincounterexample://activity/describe-problem", "target": "domain-counterexample://entity/problem", "entity_count": 5, "activity_count": 5, "bind_count": 0},
     {"id": "17-local-project-dogfood", "source": "17-local-project-dogfood.gooo", "generation": "PASS", "root": "localproject://activity/define-workspace", "target": "local-project://entity/workspace", "entity_count": 6, "activity_count": 6, "bind_count": 0},
     {"id": "18-incident-learning", "source": "18-incident-learning.gooo", "generation": "PASS", "root": "incidentlearning://activity/capture-incident", "target": "incident://entity/incident", "entity_count": 5, "activity_count": 5, "bind_count": 0},
-    {"id": "19-incident-resolution-boundary", "source": "19-incident-resolution-boundary.gooo", "generation": "FAIL_CLOSED", "root": "incidentresolutionboundary://activity/observe-incident", "target": "incident-boundary://entity/incident", "entity_count": 2, "activity_count": 2, "bind_count": 1}
+    {"id": "19-incident-resolution-boundary", "source": "19-incident-resolution-boundary.gooo", "generation": "FAIL_CLOSED", "root": "incidentresolutionboundary://activity/observe-incident", "target": "incident-boundary://entity/incident", "entity_count": 2, "activity_count": 2, "bind_count": 1},
+    {"id": "20-domain-evidence-ledger", "source": "20-domain-evidence-ledger.gooo", "generation": "PASS", "root": "domainevidenceledger://activity/declare-claim", "target": "evidence-ledger://entity/claim", "entity_count": 6, "activity_count": 6, "bind_count": 0}
   ]
 }
