@@ -1,0 +1,9 @@
+package delivery
+namespace delivery
+
+entity Request id "delivery://entity/request"
+entity Artifact id "delivery://entity/artifact"
+entity Receipt id "delivery://entity/receipt"
+
+activity BuildArtifact(Request) -> Artifact
+activity RecordReceipt(Artifact) -> Receipt

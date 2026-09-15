@@ -1,0 +1,59 @@
+name: Gooo best-practice corpus
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GOOO_REF: 9914e0db4cb83234e11ad00b03f115e37b0a740a
+
+jobs:
+  execute-corpus:
+    name: Execute every .gooo best-practice fixture
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout conformance lab
+        uses: actions/checkout@v5
+
+      - name: Checkout pinned Gooo compiler
+        uses: actions/checkout@v5
+        with:
+          repository: kimjooyoon/meta-ontology-go
+          ref: ${{ env.GOOO_REF }}
+          path: meta-ontology-go
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.x'
+          cache: false
+
+      - name: Generate and verify corpus
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p generated receipts
+          count=0
+          for source in fixtures/best-practices/*.gooo; do
+            name="$(basename "$source" .gooo)"
+            go run ./meta-ontology-go/cmd/gooo generate --json "$source" --out "generated/$name" > "receipts/$name.json"
+            python3 ci/verify_gooo_generate.py "receipts/$name.json"
+            test -n "$(find "generated/$name" -type f -name '*.go' -print -quit)"
+            count=$((count + 1))
+          done
+          test "$count" -eq 3
+          echo "Verified $count executable .gooo best-practice fixtures." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload generated corpus receipt
+        uses: actions/upload-artifact@v5
+        with:
+          name: gooo-best-practice-corpus
+          path: |
+            fixtures/best-practices
+            generated
+            receipts

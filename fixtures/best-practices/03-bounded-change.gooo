@@ -1,0 +1,8 @@
+package evolution
+namespace evolution
+
+entity Candidate id "evolution://entity/candidate"
+entity Baseline id "evolution://entity/baseline"
+entity Decision id "evolution://entity/decision"
+
+activity CompareCandidate(Candidate, Baseline) -> Decision
