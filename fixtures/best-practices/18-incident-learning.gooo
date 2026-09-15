@@ -1,0 +1,14 @@
+package incidentlearning
+namespace incidentlearning
+
+entity Incident id "incident://entity/incident"
+entity Hypothesis id "incident://entity/hypothesis"
+entity Experiment id "incident://entity/experiment"
+entity Observation id "incident://entity/observation"
+entity Decision id "incident://entity/decision"
+
+activity CaptureIncident(Incident) -> Incident computes "incident.learning:capture"
+activity FormHypothesis(Incident) -> Hypothesis computes "incident.learning:hypothesize"
+activity RunExperiment(Hypothesis) -> Experiment computes "incident.learning:experiment"
+activity ObserveResult(Experiment) -> Observation computes "incident.learning:observe"
+activity RecordDecision(Observation) -> Decision computes "incident.learning:decide"
