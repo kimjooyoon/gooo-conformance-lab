@@ -57,6 +57,8 @@ small problem-solving scenarios that use the same shape:
   observed state, drift finding, change plan, validation, and decision.
 - agent handoff provenance: preserve a work claim, input snapshot, candidate,
   independent review, decision, dossier, and next operation for resumption.
+- agent handoff runtime boundary: preserve the candidate-to-review bind while
+  CI records the unsupported multi-activity execution as `FAIL_CLOSED`.
 
 The compiler observes the declared relationships and the CI observes the
 generated/query results. It does not claim that these declarations execute a
