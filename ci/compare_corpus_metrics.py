@@ -35,10 +35,21 @@ for field in integer_fields:
         ),
     }
 
+results = [metric["result"] for metric in comparison["metrics"].values()]
+comparison["next_operation"] = (
+    "REESTABLISH_EXACT_BASELINE"
+    if comparison["state"] == "UNKNOWN"
+    else "PROFILE_AND_REDUCE_OBSERVER_OVERHEAD"
+    if "REGRESSED" in results
+    else "NO_PERFORMANCE_ACTION_REQUIRED"
+)
+comparison["blocked_by"] = []
+
 output = Path("receipts/corpus-metric-comparison.json")
 output.write_text(json.dumps(comparison, indent=2, sort_keys=True) + "\n")
 print("### Corpus metric comparison")
 print(f"- state: `{comparison['state']}`")
 print(f"- reason: `{comparison['reason']}`")
+print(f"- next_operation: `{comparison['next_operation']}`")
 for field, metric in comparison["metrics"].items():
     print(f"- {field}: `{metric['result']}` before `{metric['before']}` after `{metric['after']}`")
