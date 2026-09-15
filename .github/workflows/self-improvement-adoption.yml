@@ -42,7 +42,7 @@ jobs:
           AUTHORIZATION_JSON: ${{ inputs.authorization_json }}
         run: |
           set -euo pipefail
-          mkdir -p observation proposal authorization adoption
+          mkdir -p observation proposal authorization adoption certificate retention
           (cd meta-ontology-go && go run ./cmd/gooo observe \
             ../fixtures/self-improvement-observation/observation.gooo \
             --input ../fixtures/self-improvement-observation/input.gooo \
@@ -73,6 +73,40 @@ jobs:
           print("verified caller-authorized bounded adoption")
           PY
 
+          (cd meta-ontology-go && go run ./cmd/gooo certify \
+            ../fixtures/self-improvement-observation/observation.gooo \
+            --input ../fixtures/self-improvement-observation/input.gooo \
+            --observation ../observation/compiler-observation.json \
+            --proposal ../proposal/adoption-proposal.json \
+            --authorization ../authorization/explicit.json \
+            --adoption ../adoption/adoption-result.json \
+            --out ../certificate)
+          test -s certificate/retained-knowledge-certificate.json
+          test -s certificate/retention-before.json
+
+          (cd meta-ontology-go && go run ./cmd/gooo consume \
+            ../fixtures/self-improvement-observation/observation.gooo \
+            --input ../fixtures/self-improvement-observation/input.gooo \
+            --observation ../observation/compiler-observation.json \
+            --proposal ../proposal/adoption-proposal.json \
+            --authorization ../authorization/explicit.json \
+            --adoption ../adoption/adoption-result.json \
+            --certificate ../certificate/retained-knowledge-certificate.json \
+            --out ../retention)
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          result = json.loads(Path("retention/retention-result.json").read_text())
+          if result.get("decision") != "CLOSED":
+              raise SystemExit("retained certificate was not consumed as CLOSED")
+          if result.get("metrics", {}).get("certificate_hits") != 1:
+              raise SystemExit("retention result did not record one certificate hit")
+          if result.get("repository_writes") != 0:
+              raise SystemExit("retention consumption declared repository writes")
+          print("verified separate-invocation retained certificate consumption")
+          PY
+
       - name: Upload authorized adoption receipt
         uses: actions/upload-artifact@v5
         with:
@@ -82,3 +116,5 @@ jobs:
             proposal
             authorization/explicit.json
             adoption
+            certificate
+            retention
