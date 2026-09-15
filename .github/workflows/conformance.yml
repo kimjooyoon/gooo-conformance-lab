@@ -152,7 +152,7 @@ jobs:
           go run ./cmd/gooo generate --json ../fixtures/basic-query.gooo --out ../generated > ../gooo-generate-result.json
       - name: Verify generation result
         run: |
-          python3 ci/verify_gooo_generate.py gooo-generate-result.json
+          python3 ci/verify_gooo_generate.py gooo-generate-result.json fixtures/basic-query.gooo 2 1
           test -n "$(find generated -type f -name '*.go' -print -quit)"
       - name: Publish generation result
         if: always()
