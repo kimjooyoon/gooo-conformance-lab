@@ -297,3 +297,9 @@ jobs:
           github-token: ${{ github.token }}
       - name: Review improvement decision independently
         run: python3 ci/review_improvement_decision.py
+      - name: Upload independent review receipt
+        uses: actions/upload-artifact@v5
+        with:
+          name: gooo-independent-improvement-review
+          path: review-artifact/receipts/baseline-review.json
+          if-no-files-found: error
