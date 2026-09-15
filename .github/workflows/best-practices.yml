@@ -63,38 +63,24 @@ jobs:
             (
               name="$(basename "$source" .gooo)"
               read -r generation root target < <(python3 ci/catalog_case.py "$name")
+              set +e
+              (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"
+              generation_status=$?
+              set -e
               if [ "$generation" = "FAIL_CLOSED" ]; then
-              if (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"; then
+              if [ "$generation_status" -eq 0 ]; then
                 echo "runtime binding generation unexpectedly succeeded" >&2
                 exit 1
               fi
+              python3 ci/verify_generation_boundary.py "$source" "receipts/$name.json"
               else
-              if ! (cd meta-ontology-go && go run ./cmd/gooo generate --json "../$source" --out "../generated/$name") > "receipts/$name.json"; then
+              if [ "$generation_status" -ne 0 ]; then
                 cat "receipts/$name.json"
                 echo "generation failed for $source" >&2
                 exit 1
               fi
               python3 ci/verify_gooo_generate.py "receipts/$name.json"
               test -n "$(find "generated/$name" -type f -name '*.go' -print -quit)"
-              fi
-              fi
-              if [ "$generation" = "FAIL_CLOSED" ]; then
-                SOURCE_FILE="$source" python3 - <<'PY4'
-          import json
-          import os
-          from pathlib import Path
-
-          source = Path(os.environ["SOURCE_FILE"])
-          receipt = json.loads((Path("receipts") / (source.stem + ".json")).read_text())
-          diagnostics = receipt.get("diagnostics", [])
-          if receipt.get("status") != "error" or not any(
-              item.get("code") == "generator.generate"
-              and "runtime bindings are unsupported" in item.get("message", "")
-              for item in diagnostics
-          ):
-              raise SystemExit(f"runtime binding generation boundary was not explicit for {source.name}")
-          print(f"recorded expected runtime binding generation boundary for {source.name}")
-          PY4
               fi
               if ! (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"; then
                 cat "receipts/$name-query.json"
