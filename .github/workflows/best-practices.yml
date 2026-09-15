@@ -232,6 +232,7 @@ jobs:
           print("verified non-executing repair candidate from runtime refutation")
           PY7
           python3 ci/write_corpus_metrics.py --out receipts/corpus-metrics.json | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 ci/write_domain_observation.py --out receipts/domain-observation.json | tee -a "$GITHUB_STEP_SUMMARY"
           echo "Verified $count executable .gooo best-practice fixtures." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload generated corpus receipt
