@@ -79,7 +79,7 @@ jobs:
               07-self-improvement-loop) root="evolution://activity/observe-problem"; target="evolution://entity/observed-problem" ;;
               08-counterexample-guided-repair) root="repair://activity/observe-failure"; target="repair://entity/failure-observation" ;;
               09-runtime-plan) root="runtime://activity/process"; target="runtime://entity/integer" ;;
-              10-runtime-chain) root="runtime-chain://activity/produce"; target="runtime-chain://entity/integer" ;;
+              10-runtime-chain) root="runtimechain://activity/produce"; target="runtime-chain://entity/integer" ;;
               *) echo "unknown best-practice fixture: $name" >&2; exit 1 ;;
             esac
             if [ "$name" = "10-runtime-chain" ]; then
