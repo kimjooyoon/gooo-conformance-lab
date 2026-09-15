@@ -1,0 +1,73 @@
+name: Gooo self-improvement observation
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GOOO_REF: 9914e0db4cb83234e11ad00b03f115e37b0a740a
+
+jobs:
+  observe-and-propose:
+    name: Observe and propose from .gooo authority
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout conformance lab
+        uses: actions/checkout@v5
+
+      - name: Checkout pinned Gooo compiler
+        uses: actions/checkout@v5
+        with:
+          repository: kimjooyoon/meta-ontology-go
+          ref: ${{ env.GOOO_REF }}
+          path: meta-ontology-go
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.x'
+          cache: false
+
+      - name: Run bounded observation and proposal
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p observation proposal
+          (cd meta-ontology-go && go run ./cmd/gooo observe \
+            ../fixtures/self-improvement-observation/observation.gooo \
+            --input ../fixtures/self-improvement-observation/input.gooo \
+            --out ../observation)
+          test -s observation/compiler-observation.json
+          (cd meta-ontology-go && go run ./cmd/gooo propose \
+            ../observation/compiler-observation.json \
+            --out ../proposal)
+          test -s proposal/adoption-proposal.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          observation = json.loads(Path("observation/compiler-observation.json").read_text())
+          proposal = json.loads(Path("proposal/adoption-proposal.json").read_text())
+          if not observation.get("candidates"):
+              raise SystemExit("observation emitted no candidate")
+          if proposal.get("execution_allowed") is not False:
+              raise SystemExit("proposal unexpectedly grants execution")
+          if proposal.get("repository_writes") != 0:
+              raise SystemExit("proposal declares repository writes")
+          print("verified bounded observation and proposal-only adoption boundary")
+          PY
+          echo "Observed candidates: ${#observation[@]}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload observation and proposal receipts
+        uses: actions/upload-artifact@v5
+        with:
+          name: gooo-self-improvement-observation
+          path: |
+            fixtures/self-improvement-observation
+            observation
+            proposal
