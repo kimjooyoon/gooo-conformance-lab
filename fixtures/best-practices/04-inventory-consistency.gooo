@@ -1,0 +1,8 @@
+package inventory
+namespace inventory
+
+entity OrderLine id "inventory://entity/order-line"
+entity StockSnapshot id "inventory://entity/stock-snapshot"
+entity Reconciliation id "inventory://entity/reconciliation"
+
+activity ReconcileStock(OrderLine, StockSnapshot) -> Reconciliation

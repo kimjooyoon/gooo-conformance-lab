@@ -1,0 +1,8 @@
+package governance
+namespace governance
+
+entity ProblemReport id "governance://entity/problem-report"
+entity RepairCandidate id "governance://entity/repair-candidate"
+entity ReviewDecision id "governance://entity/review-decision"
+
+activity ReviewRepair(ProblemReport, RepairCandidate) -> ReviewDecision

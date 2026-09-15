@@ -1,0 +1,8 @@
+package platform
+namespace platform
+
+entity ServiceContract id "platform://entity/service-contract"
+entity DeploymentPlan id "platform://entity/deployment-plan"
+entity DeploymentReceipt id "platform://entity/deployment-receipt"
+
+activity ValidateDeployment(ServiceContract, DeploymentPlan) -> DeploymentReceipt

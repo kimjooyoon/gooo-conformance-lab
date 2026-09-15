@@ -48,13 +48,16 @@ jobs:
               01-domain-model) root="billing://activity/pay-order"; target="billing://entity/order" ;;
               02-provenance-chain) root="delivery://activity/build-artifact"; target="delivery://entity/request" ;;
               03-bounded-change) root="evolution://activity/compare-candidate"; target="evolution://entity/candidate" ;;
+              04-inventory-consistency) root="inventory://activity/reconcile-stock"; target="inventory://entity/order-line" ;;
+              05-deployment-contract) root="platform://activity/validate-deployment"; target="platform://entity/service-contract" ;;
+              06-change-review) root="governance://activity/review-repair"; target="governance://entity/problem-report" ;;
               *) echo "unknown best-practice fixture: $name" >&2; exit 1 ;;
             esac
             (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"
             python3 ci/verify_gooo_query_case.py "receipts/$name-query.json" "$root" "$target"
             count=$((count + 1))
           done
-          test "$count" -eq 3
+          test "$count" -eq 6
           echo "Verified $count executable .gooo best-practice fixtures." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload generated corpus receipt
