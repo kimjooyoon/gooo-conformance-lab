@@ -292,6 +292,7 @@ jobs:
             --generated-compile-wall-ms "$compile_wall_ms" \
             --generation-query-wall-ms "$generation_query_wall_ms" \
             --runtime-provenance-wall-ms "$runtime_provenance_wall_ms" | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 ci/verify_language_inventory.py | tee -a "$GITHUB_STEP_SUMMARY"
           python3 ci/compare_corpus_metrics.py | tee -a "$GITHUB_STEP_SUMMARY"
           python3 ci/write_baseline_candidate.py | tee -a "$GITHUB_STEP_SUMMARY"
           python3 ci/write_improvement_decision.py | tee -a "$GITHUB_STEP_SUMMARY"
