@@ -8,6 +8,3 @@ entity Decision id "domain://entity/decision"
 activity DescribeProblem(Problem) -> Problem computes "domain.describe:problem"
 activity ProposeResolution(Problem) -> Resolution computes "domain.propose:resolution"
 activity RecordDecision(Resolution) -> Decision computes "domain.record:decision"
-
-bind DescribeProblem.result -> ProposeResolution.input
-bind ProposeResolution.result -> RecordDecision.input
