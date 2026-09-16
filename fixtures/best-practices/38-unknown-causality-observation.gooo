@@ -1,0 +1,20 @@
+package unknowncausality
+namespace unknowncausality
+
+entity UnknownRecord id "unknown-causality://entity/unknown-record"
+entity Stage id "unknown-causality://entity/stage"
+entity Step id "unknown-causality://entity/step"
+entity UnknownReason id "unknown-causality://entity/reason"
+entity UnknownClass id "unknown-causality://entity/class"
+entity NextOperation id "unknown-causality://entity/next-operation"
+entity BlockedFrontier id "unknown-causality://entity/blocked-frontier"
+entity ResolutionEvidence id "unknown-causality://entity/resolution-evidence"
+
+activity CaptureUnknown(UnknownRecord) -> Stage computes "unknown.causality:capture"
+activity IdentifyStep(Stage) -> Step computes "unknown.causality:step"
+activity RecordReason(Step) -> UnknownReason computes "unknown.causality:reason"
+activity ClassifyUnknown(UnknownReason) -> UnknownClass computes "unknown.causality:classify"
+activity BindNextOperation(UnknownClass) -> NextOperation computes "unknown.causality:next"
+activity PreserveBlockedFrontier(NextOperation) -> BlockedFrontier computes "unknown.causality:frontier"
+activity CaptureResolution(BlockedFrontier) -> ResolutionEvidence computes "unknown.causality:resolve"
+activity PublishResolution(ResolutionEvidence) -> UnknownRecord computes "unknown.causality:publish"
