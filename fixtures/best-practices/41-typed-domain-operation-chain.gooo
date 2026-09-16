@@ -1,0 +1,13 @@
+package typeddomainchain
+namespace typeddomainchain
+
+entity Integer id "typed-domain-chain://entity/integer"
+entity DomainObservation id "typed-domain-chain://entity/domain-observation"
+entity ResolutionCandidate id "typed-domain-chain://entity/resolution-candidate"
+
+activity ObserveDomain(Integer) -> Integer computes "int.add:1"
+activity ProposeResolution(Integer) -> Integer computes "int.add:1"
+activity RecordOutcome(Integer) -> Integer computes "int.add:1"
+
+bind ObserveDomain.result -> ProposeResolution.input
+bind ProposeResolution.result -> RecordOutcome.input
