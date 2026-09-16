@@ -38,6 +38,6 @@
     {"id": "35-compiler-feedback-repair-observation", "source": "35-compiler-feedback-repair-observation.gooo", "generation": "PASS", "root": "compilerfeedbackrepair://activity/capture-diagnostic", "target": "compiler-feedback://entity/diagnostic", "entity_count": 8, "activity_count": 8, "bind_count": 0},
     {"id": "36-human-dossier-publication", "source": "36-human-dossier-publication.gooo", "generation": "PASS", "root": "humandossierpublication://activity/collect-claim", "target": "human-dossier://entity/claim", "entity_count": 8, "activity_count": 8, "bind_count": 0},
     {"id": "37-read-only-write-grant-boundary", "source": "37-read-only-write-grant-boundary.gooo", "generation": "PASS", "root": "readonlywritegrant://activity/observe-source", "target": "write-grant://entity/source-observation", "entity_count": 8, "activity_count": 8, "bind_count": 0},
-    {"id": "38-unknown-causality-observation", "source": "38-unknown-causality-observation.gooo", "generation": "PASS", "root": "unknowncausality://activity/classify-unknown", "target": "unknown-causality://entity/unknown-record", "entity_count": 8, "activity_count": 8, "bind_count": 0}
+    {"id": "38-unknown-causality-observation", "source": "38-unknown-causality-observation.gooo", "generation": "PASS", "root": "unknowncausality://activity/capture-unknown", "target": "unknown-causality://entity/unknown-record", "entity_count": 8, "activity_count": 8, "bind_count": 0}
   ]
 }
