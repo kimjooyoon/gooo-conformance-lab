@@ -1,0 +1,20 @@
+package readonlywritegrant
+namespace readonlywritegrant
+
+entity SourceObservation id "write-grant://entity/source-observation"
+entity ReadOnlySnapshot id "write-grant://entity/read-only-snapshot"
+entity CandidateArtifact id "write-grant://entity/candidate-artifact"
+entity CallerOutput id "write-grant://entity/caller-output"
+entity WriteGrant id "write-grant://entity/write-grant"
+entity GrantScope id "write-grant://entity/grant-scope"
+entity DenialRecord id "write-grant://entity/denial-record"
+entity BoundaryEvidence id "write-grant://entity/boundary-evidence"
+
+activity ObserveSource(SourceObservation) -> ReadOnlySnapshot computes "write.grant:observe"
+activity GenerateCandidate(ReadOnlySnapshot) -> CandidateArtifact computes "write.grant:candidate"
+activity MaterializeCallerOutput(CandidateArtifact) -> CallerOutput computes "write.grant:output"
+activity DeclareGrantScope(CallerOutput) -> GrantScope computes "write.grant:scope"
+activity RequestWriteGrant(GrantScope) -> WriteGrant computes "write.grant:request"
+activity DenyUnscopedWrite(WriteGrant) -> DenialRecord computes "write.grant:deny"
+activity PreserveBoundary(DenialRecord) -> BoundaryEvidence computes "write.grant:evidence"
+activity PublishBoundary(BoundaryEvidence) -> SourceObservation computes "write.grant:publish"
