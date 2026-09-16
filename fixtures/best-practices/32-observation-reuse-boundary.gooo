@@ -1,0 +1,20 @@
+package observationreuseboundary
+namespace observationreuseboundary
+
+entity ReuseContract id "observation-reuse://entity/reuse-contract"
+entity InputSnapshot id "observation-reuse://entity/input-snapshot"
+entity ToolchainSnapshot id "observation-reuse://entity/toolchain-snapshot"
+entity ScopeSnapshot id "observation-reuse://entity/scope-snapshot"
+entity PriorObservation id "observation-reuse://entity/prior-observation"
+entity ReuseDecision id "observation-reuse://entity/reuse-decision"
+entity FreshObservation id "observation-reuse://entity/fresh-observation"
+entity CostEvidence id "observation-reuse://entity/cost-evidence"
+
+activity DeclareReuseContract(ReuseContract) -> InputSnapshot computes "observation.reuse:declare"
+activity PinToolchain(InputSnapshot) -> ToolchainSnapshot computes "observation.reuse:toolchain"
+activity PinScope(ToolchainSnapshot) -> ScopeSnapshot computes "observation.reuse:scope"
+activity ComparePriorObservation(ScopeSnapshot) -> PriorObservation computes "observation.reuse:compare"
+activity DecideReuse(PriorObservation) -> ReuseDecision computes "observation.reuse:decide"
+activity CaptureFreshObservation(ReuseDecision) -> FreshObservation computes "observation.reuse:fresh"
+activity PreserveCostEvidence(FreshObservation) -> CostEvidence computes "observation.reuse:cost"
+activity PublishReuseDecision(CostEvidence) -> ReuseContract computes "observation.reuse:publish"
