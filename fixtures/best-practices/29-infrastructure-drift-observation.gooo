@@ -1,0 +1,20 @@
+package infrastructuredriftobservation
+namespace infrastructuredriftobservation
+
+entity InfrastructureContract id "infrastructure-drift://entity/contract"
+entity DesiredResource id "infrastructure-drift://entity/desired-resource"
+entity ObservedResource id "infrastructure-drift://entity/observed-resource"
+entity DriftObservation id "infrastructure-drift://entity/drift-observation"
+entity Counterexample id "infrastructure-drift://entity/counterexample"
+entity ChangeCandidate id "infrastructure-drift://entity/change-candidate"
+entity PlanEvaluation id "infrastructure-drift://entity/plan-evaluation"
+entity ApplyDecision id "infrastructure-drift://entity/apply-decision"
+
+activity DeclareInfrastructureContract(InfrastructureContract) -> DesiredResource computes "infrastructure.drift:declare"
+activity ObserveInfrastructure(DesiredResource) -> ObservedResource computes "infrastructure.drift:observe"
+activity DetectDrift(ObservedResource) -> DriftObservation computes "infrastructure.drift:detect"
+activity PreserveDriftCounterexample(DriftObservation) -> Counterexample computes "infrastructure.drift:counterexample"
+activity ProposeChange(Counterexample) -> ChangeCandidate computes "infrastructure.drift:candidate"
+activity EvaluatePlan(ChangeCandidate) -> PlanEvaluation computes "infrastructure.drift:evaluate"
+activity DecideApply(PlanEvaluation) -> ApplyDecision computes "infrastructure.drift:decide"
+activity ReconcileContract(ApplyDecision) -> InfrastructureContract computes "infrastructure.drift:reconcile"
