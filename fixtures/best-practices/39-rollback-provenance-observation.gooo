@@ -1,0 +1,20 @@
+package rollbackprovenance
+namespace rollbackprovenance
+
+entity Candidate id "rollback://entity/candidate"
+entity Baseline id "rollback://entity/baseline"
+entity ApplyReceipt id "rollback://entity/apply-receipt"
+entity ReplayMismatch id "rollback://entity/replay-mismatch"
+entity RefutingEvidence id "rollback://entity/refuting-evidence"
+entity RollbackPlan id "rollback://entity/rollback-plan"
+entity RollbackReceipt id "rollback://entity/rollback-receipt"
+entity ContinuationDecision id "rollback://entity/continuation-decision"
+
+activity DeclareCandidate(Candidate) -> Baseline computes "rollback.provenance:declare"
+activity RecordApply(Candidate) -> ApplyReceipt computes "rollback.provenance:apply"
+activity CompareReplay(ApplyReceipt) -> ReplayMismatch computes "rollback.provenance:compare"
+activity PreserveRefutation(ReplayMismatch) -> RefutingEvidence computes "rollback.provenance:refute"
+activity PlanRollback(RefutingEvidence) -> RollbackPlan computes "rollback.provenance:plan"
+activity ExecuteRollback(RollbackPlan) -> RollbackReceipt computes "rollback.provenance:rollback"
+activity DecideContinuation(RollbackReceipt) -> ContinuationDecision computes "rollback.provenance:decide"
+activity PublishContinuation(ContinuationDecision) -> Candidate computes "rollback.provenance:publish"
