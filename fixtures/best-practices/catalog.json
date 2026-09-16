@@ -35,6 +35,7 @@
     {"id": "32-observation-reuse-boundary", "source": "32-observation-reuse-boundary.gooo", "generation": "PASS", "root": "observationreuseboundary://activity/declare-reuse-contract", "target": "observation-reuse://entity/reuse-contract", "entity_count": 8, "activity_count": 8, "bind_count": 0},
     {"id": "33-semantic-ir-provenance-observation", "source": "33-semantic-ir-provenance-observation.gooo", "generation": "PASS", "root": "semanticirprovenance://activity/parse-source", "target": "semantic-ir://entity/source-program", "entity_count": 8, "activity_count": 8, "bind_count": 0},
     {"id": "34-bounded-self-improvement-loop", "source": "34-bounded-self-improvement-loop.gooo", "generation": "PASS", "root": "boundedselfimprovement://activity/declare-loop-contract", "target": "bounded-loop://entity/loop-contract", "entity_count": 8, "activity_count": 8, "bind_count": 0},
-    {"id": "35-compiler-feedback-repair-observation", "source": "35-compiler-feedback-repair-observation.gooo", "generation": "PASS", "root": "compilerfeedbackrepair://activity/capture-diagnostic", "target": "compiler-feedback://entity/diagnostic", "entity_count": 8, "activity_count": 8, "bind_count": 0}
+    {"id": "35-compiler-feedback-repair-observation", "source": "35-compiler-feedback-repair-observation.gooo", "generation": "PASS", "root": "compilerfeedbackrepair://activity/capture-diagnostic", "target": "compiler-feedback://entity/diagnostic", "entity_count": 8, "activity_count": 8, "bind_count": 0},
+    {"id": "36-human-dossier-publication", "source": "36-human-dossier-publication.gooo", "generation": "PASS", "root": "humandossierpublication://activity/collect-claim", "target": "human-dossier://entity/claim", "entity_count": 8, "activity_count": 8, "bind_count": 0}
   ]
 }

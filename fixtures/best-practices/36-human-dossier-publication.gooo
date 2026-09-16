@@ -1,0 +1,20 @@
+package humandossierpublication
+namespace humandossierpublication
+
+entity Claim id "human-dossier://entity/claim"
+entity Scope id "human-dossier://entity/scope"
+entity Attempt id "human-dossier://entity/attempt"
+entity Evidence id "human-dossier://entity/evidence"
+entity Counterexample id "human-dossier://entity/counterexample"
+entity Decision id "human-dossier://entity/decision"
+entity NextOperation id "human-dossier://entity/next-operation"
+entity Dossier id "human-dossier://entity/dossier"
+
+activity CollectClaim(Claim) -> Scope computes "human.dossier:claim"
+activity RecordAttempt(Scope) -> Attempt computes "human.dossier:attempt"
+activity AttachEvidence(Attempt) -> Evidence computes "human.dossier:evidence"
+activity AttachCounterexample(Evidence) -> Counterexample computes "human.dossier:counterexample"
+activity RecordDecision(Counterexample) -> Decision computes "human.dossier:decision"
+activity BindNextOperation(Decision) -> NextOperation computes "human.dossier:next"
+activity PublishDossier(NextOperation) -> Dossier computes "human.dossier:publish"
+activity SearchDossier(Dossier) -> Claim computes "human.dossier:search"
