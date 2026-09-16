@@ -1,0 +1,20 @@
+package boundedselfimprovement
+namespace boundedselfimprovement
+
+entity LoopContract id "bounded-loop://entity/loop-contract"
+entity ProblemObservation id "bounded-loop://entity/problem-observation"
+entity RepairCandidate id "bounded-loop://entity/repair-candidate"
+entity IterationBudget id "bounded-loop://entity/iteration-budget"
+entity ScopeBoundary id "bounded-loop://entity/scope-boundary"
+entity ReplayResult id "bounded-loop://entity/replay-result"
+entity Counterexample id "bounded-loop://entity/counterexample"
+entity LoopDecision id "bounded-loop://entity/loop-decision"
+
+activity DeclareLoopContract(LoopContract) -> IterationBudget computes "bounded.loop:declare"
+activity ObserveProblem(IterationBudget) -> ProblemObservation computes "bounded.loop:observe"
+activity GenerateCandidate(ProblemObservation) -> RepairCandidate computes "bounded.loop:candidate"
+activity PinScope(RepairCandidate) -> ScopeBoundary computes "bounded.loop:scope"
+activity ReplayCandidate(ScopeBoundary) -> ReplayResult computes "bounded.loop:replay"
+activity PreserveCounterexample(ReplayResult) -> Counterexample computes "bounded.loop:counterexample"
+activity DecideContinuation(Counterexample) -> LoopDecision computes "bounded.loop:decide"
+activity PublishLoopDecision(LoopDecision) -> LoopContract computes "bounded.loop:publish"
