@@ -26,6 +26,7 @@
     {"id": "23-agent-handoff-runtime-boundary", "source": "23-agent-handoff-runtime-boundary.gooo", "generation": "FAIL_CLOSED", "root": "agenthandoffboundary://activity/propose-candidate", "target": "agent-handoff-boundary://entity/candidate", "entity_count": 2, "activity_count": 2, "bind_count": 1},
     {"id": "24-compiler-diagnostic-triage", "source": "24-compiler-diagnostic-triage.gooo", "generation": "PASS", "root": "compilerdiagnostictriage://activity/capture-diagnostic", "target": "compiler-diagnostic://entity/diagnostic", "entity_count": 7, "activity_count": 7, "bind_count": 0},
     {"id": "25-domain-migration-boundary", "source": "25-domain-migration-boundary.gooo", "generation": "PASS", "root": "domainmigrationboundary://activity/describe-current-domain", "target": "domain-migration://entity/current-domain", "entity_count": 7, "activity_count": 7, "bind_count": 0},
-    {"id": "26-self-observation-replay", "source": "26-self-observation-replay.gooo", "generation": "PASS", "root": "selfobservationreplay://activity/declare-work-claim", "target": "self-observation://entity/work-claim", "entity_count": 8, "activity_count": 8, "bind_count": 0}
+    {"id": "26-self-observation-replay", "source": "26-self-observation-replay.gooo", "generation": "PASS", "root": "selfobservationreplay://activity/declare-work-claim", "target": "self-observation://entity/work-claim", "entity_count": 8, "activity_count": 8, "bind_count": 0},
+    {"id": "27-domain-problem-solution-observation", "source": "27-domain-problem-solution-observation.gooo", "generation": "PASS", "root": "domainproblemsolution://activity/define-domain", "target": "domain-problem-solution://entity/domain", "entity_count": 9, "activity_count": 9, "bind_count": 0}
   ]
 }

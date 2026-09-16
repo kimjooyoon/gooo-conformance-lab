@@ -1,0 +1,22 @@
+package domainproblemsolution
+namespace domainproblemsolution
+
+entity Domain id "domain-problem-solution://entity/domain"
+entity DomainRule id "domain-problem-solution://entity/domain-rule"
+entity ProblemObservation id "domain-problem-solution://entity/problem-observation"
+entity Counterexample id "domain-problem-solution://entity/counterexample"
+entity CandidateSolution id "domain-problem-solution://entity/candidate-solution"
+entity EvaluationResult id "domain-problem-solution://entity/evaluation-result"
+entity UserOutcome id "domain-problem-solution://entity/user-outcome"
+entity DecisionRecord id "domain-problem-solution://entity/decision-record"
+entity ProvenanceBundle id "domain-problem-solution://entity/provenance-bundle"
+
+activity DefineDomain(Domain) -> DomainRule computes "domain.problem:define"
+activity ObserveProblem(DomainRule) -> ProblemObservation computes "domain.problem:observe"
+activity PreserveCounterexample(ProblemObservation) -> Counterexample computes "domain.problem:counterexample"
+activity GenerateCandidate(Counterexample) -> CandidateSolution computes "domain.problem:candidate"
+activity EvaluateCandidate(CandidateSolution) -> EvaluationResult computes "domain.problem:evaluate"
+activity RecordUserOutcome(EvaluationResult) -> UserOutcome computes "domain.problem:outcome"
+activity DecideAdoption(UserOutcome) -> DecisionRecord computes "domain.problem:decide"
+activity PreserveProvenance(DecisionRecord) -> ProvenanceBundle computes "domain.problem:provenance"
+activity RefineDomain(ProvenanceBundle) -> Domain computes "domain.problem:refine"
