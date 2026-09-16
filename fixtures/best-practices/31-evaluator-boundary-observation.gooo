@@ -1,0 +1,20 @@
+package evaluatorboundaryobservation
+namespace evaluatorboundaryobservation
+
+entity EvaluationContract id "evaluator-boundary://entity/evaluation-contract"
+entity CandidateChange id "evaluator-boundary://entity/candidate-change"
+entity IndependentBaseline id "evaluator-boundary://entity/independent-baseline"
+entity EvaluationRun id "evaluator-boundary://entity/evaluation-run"
+entity Counterexample id "evaluator-boundary://entity/counterexample"
+entity AdmissionDecision id "evaluator-boundary://entity/admission-decision"
+entity AuthorityBoundary id "evaluator-boundary://entity/authority-boundary"
+entity EvaluationEvidence id "evaluator-boundary://entity/evaluation-evidence"
+
+activity DeclareEvaluationContract(EvaluationContract) -> AuthorityBoundary computes "evaluator.boundary:declare"
+activity PinIndependentBaseline(AuthorityBoundary) -> IndependentBaseline computes "evaluator.boundary:baseline"
+activity ReceiveCandidate(CandidateChange) -> EvaluationRun computes "evaluator.boundary:run"
+activity CompareCandidate(EvaluationRun) -> Counterexample computes "evaluator.boundary:counterexample"
+activity AdjudicateCandidate(Counterexample) -> AdmissionDecision computes "evaluator.boundary:adjudicate"
+activity PreserveDecision(AdmissionDecision) -> EvaluationEvidence computes "evaluator.boundary:evidence"
+activity RejectSelfModification(EvaluationEvidence) -> AuthorityBoundary computes "evaluator.boundary:reject-self-change"
+activity PublishEvaluation(EvaluationEvidence) -> EvaluationContract computes "evaluator.boundary:publish"
