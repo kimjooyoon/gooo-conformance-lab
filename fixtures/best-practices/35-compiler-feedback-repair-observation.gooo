@@ -1,0 +1,20 @@
+package compilerfeedbackrepair
+namespace compilerfeedbackrepair
+
+entity Diagnostic id "compiler-feedback://entity/diagnostic"
+entity SourceSnapshot id "compiler-feedback://entity/source-snapshot"
+entity FailureClassification id "compiler-feedback://entity/failure-classification"
+entity RepairConstraint id "compiler-feedback://entity/repair-constraint"
+entity RepairCandidate id "compiler-feedback://entity/repair-candidate"
+entity GeneratedArtifact id "compiler-feedback://entity/generated-artifact"
+entity ReplayComparison id "compiler-feedback://entity/replay-comparison"
+entity RepairDecision id "compiler-feedback://entity/repair-decision"
+
+activity CaptureDiagnostic(Diagnostic) -> SourceSnapshot computes "compiler.feedback:capture"
+activity ClassifyFailure(SourceSnapshot) -> FailureClassification computes "compiler.feedback:classify"
+activity BindRepairConstraint(FailureClassification) -> RepairConstraint computes "compiler.feedback:constraint"
+activity GenerateRepair(RepairConstraint) -> RepairCandidate computes "compiler.feedback:generate"
+activity RegenerateArtifact(RepairCandidate) -> GeneratedArtifact computes "compiler.feedback:regenerate"
+activity CompareReplay(GeneratedArtifact) -> ReplayComparison computes "compiler.feedback:replay"
+activity DecideRepair(ReplayComparison) -> RepairDecision computes "compiler.feedback:decide"
+activity PublishRepairDecision(RepairDecision) -> Diagnostic computes "compiler.feedback:publish"
