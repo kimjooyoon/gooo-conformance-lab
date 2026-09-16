@@ -1,0 +1,20 @@
+package domainevolution
+namespace domainevolution
+
+entity DomainDefinition id "domain-evolution://entity/domain-definition"
+entity ProblemObservation id "domain-evolution://entity/problem-observation"
+entity ConstraintSet id "domain-evolution://entity/constraint-set"
+entity SolutionCandidate id "domain-evolution://entity/solution-candidate"
+entity IndependentEvaluation id "domain-evolution://entity/independent-evaluation"
+entity DecisionRecord id "domain-evolution://entity/decision-record"
+entity NextObservation id "domain-evolution://entity/next-observation"
+entity EvolutionDossier id "domain-evolution://entity/evolution-dossier"
+
+activity DefineDomain(DomainDefinition) -> ConstraintSet computes "domain.evolution:define"
+activity ObserveProblem(ConstraintSet) -> ProblemObservation computes "domain.evolution:observe"
+activity ProposeSolution(ProblemObservation) -> SolutionCandidate computes "domain.evolution:propose"
+activity EvaluateIndependently(SolutionCandidate) -> IndependentEvaluation computes "domain.evolution:evaluate"
+activity RecordDecision(IndependentEvaluation) -> DecisionRecord computes "domain.evolution:decide"
+activity ScheduleNextObservation(DecisionRecord) -> NextObservation computes "domain.evolution:continue"
+activity AssembleDossier(NextObservation) -> EvolutionDossier computes "domain.evolution:dossier"
+activity PreserveEvolution(EvolutionDossier) -> DomainDefinition computes "domain.evolution:preserve"
