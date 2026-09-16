@@ -1,0 +1,20 @@
+package localprojectresume
+namespace localprojectresume
+
+entity ProjectClaim id "local-project-resume://entity/project-claim"
+entity WorkScope id "local-project-resume://entity/work-scope"
+entity DependencyFrontier id "local-project-resume://entity/dependency-frontier"
+entity OperationAttempt id "local-project-resume://entity/operation-attempt"
+entity EvidenceRecord id "local-project-resume://entity/evidence-record"
+entity UnknownCause id "local-project-resume://entity/unknown-cause"
+entity ResumeOperation id "local-project-resume://entity/resume-operation"
+entity ProjectDossier id "local-project-resume://entity/project-dossier"
+
+activity DeclareProjectClaim(ProjectClaim) -> WorkScope computes "local.project:declare"
+activity MapDependencies(WorkScope) -> DependencyFrontier computes "local.project:frontier"
+activity CaptureAttempt(DependencyFrontier) -> OperationAttempt computes "local.project:attempt"
+activity LinkEvidence(OperationAttempt) -> EvidenceRecord computes "local.project:evidence"
+activity PreserveUnknown(EvidenceRecord) -> UnknownCause computes "local.project:unknown"
+activity BindResume(UnknownCause) -> ResumeOperation computes "local.project:resume"
+activity PublishDossier(ResumeOperation) -> ProjectDossier computes "local.project:dossier"
+activity ContinueProject(ProjectDossier) -> ProjectClaim computes "local.project:continue"
