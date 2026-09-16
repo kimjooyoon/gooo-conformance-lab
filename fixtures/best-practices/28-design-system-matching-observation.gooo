@@ -1,0 +1,20 @@
+package designsystemmatching
+namespace designsystemmatching
+
+entity DesignContract id "design-system://entity/component-contract"
+entity ComponentSpec id "design-system://entity/component-spec"
+entity TokenSet id "design-system://entity/token-set"
+entity SourceComponent id "design-system://entity/source-component"
+entity MatchObservation id "design-system://entity/match-observation"
+entity MismatchReport id "design-system://entity/mismatch-report"
+entity MatchCandidate id "design-system://entity/match-candidate"
+entity AdoptionDecision id "design-system://entity/adoption-decision"
+
+activity DeclareDesignContract(DesignContract) -> ComponentSpec computes "design.system:declare"
+activity BindTokens(ComponentSpec) -> TokenSet computes "design.system:tokens"
+activity ObserveSource(SourceComponent) -> MatchObservation computes "design.system:observe"
+activity PreserveMismatch(MatchObservation) -> MismatchReport computes "design.system:mismatch"
+activity ProposeMatch(MismatchReport) -> MatchCandidate computes "design.system:candidate"
+activity EvaluateMatch(MatchCandidate) -> MatchObservation computes "design.system:evaluate"
+activity DecideAdoption(MatchObservation) -> AdoptionDecision computes "design.system:decide"
+activity PublishContract(AdoptionDecision) -> DesignContract computes "design.system:publish"
