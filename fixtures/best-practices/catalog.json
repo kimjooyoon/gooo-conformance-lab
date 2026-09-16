@@ -41,6 +41,6 @@
     {"id": "38-unknown-causality-observation", "source": "38-unknown-causality-observation.gooo", "generation": "PASS", "root": "unknowncausality://activity/capture-unknown", "target": "unknown-causality://entity/unknown-record", "entity_count": 8, "activity_count": 8, "bind_count": 0},
     {"id": "39-rollback-provenance-observation", "source": "39-rollback-provenance-observation.gooo", "generation": "PASS", "root": "rollbackprovenance://activity/declare-candidate", "target": "rollback://entity/candidate", "entity_count": 8, "activity_count": 8, "bind_count": 0},
     {"id": "40-domain-evolution-provenance", "source": "40-domain-evolution-provenance.gooo", "generation": "PASS", "root": "domainevolution://activity/define-domain", "target": "domain-evolution://entity/domain-definition", "entity_count": 8, "activity_count": 8, "bind_count": 0},
-    {"id": "41-typed-domain-operation-chain", "source": "41-typed-domain-operation-chain.gooo", "generation": "PASS", "root": "typeddomainchain://activity/observe-domain", "target": "typed-domain-chain://entity/integer", "entity_count": 3, "activity_count": 3, "bind_count": 2}
+    {"id": "41-typed-domain-operation-chain", "source": "41-typed-domain-operation-chain.gooo", "generation": "FAIL_CLOSED", "root": "typeddomainchain://activity/observe-domain", "target": "typed-domain-chain://entity/integer", "entity_count": 3, "activity_count": 3, "bind_count": 2}
   ]
 }
