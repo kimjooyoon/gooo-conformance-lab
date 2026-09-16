@@ -1,0 +1,20 @@
+package selfobservationreplay
+namespace selfobservationreplay
+
+entity WorkClaim id "self-observation://entity/work-claim"
+entity ObservationRecord id "self-observation://entity/observation-record"
+entity Counterexample id "self-observation://entity/counterexample"
+entity RepairCandidate id "self-observation://entity/repair-candidate"
+entity ReplayReceipt id "self-observation://entity/replay-receipt"
+entity DecisionRecord id "self-observation://entity/decision-record"
+entity NextOperation id "self-observation://entity/next-operation"
+entity EvidenceBundle id "self-observation://entity/evidence-bundle"
+
+activity DeclareWorkClaim(WorkClaim) -> WorkClaim computes "self.observation:declare"
+activity CaptureObservation(WorkClaim) -> ObservationRecord computes "self.observation:capture"
+activity PreserveCounterexample(ObservationRecord) -> Counterexample computes "self.observation:counterexample"
+activity ProposeRepair(Counterexample) -> RepairCandidate computes "self.observation:propose"
+activity CompareReplay(RepairCandidate) -> ReplayReceipt computes "self.observation:replay"
+activity RecordDecision(ReplayReceipt) -> DecisionRecord computes "self.observation:decide"
+activity BindNextOperation(DecisionRecord) -> NextOperation computes "self.observation:resume"
+activity PublishEvidence(NextOperation) -> EvidenceBundle computes "self.observation:evidence"
