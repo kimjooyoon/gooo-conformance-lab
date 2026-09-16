@@ -1,0 +1,20 @@
+package semanticirprovenance
+namespace semanticirprovenance
+
+entity SourceProgram id "semantic-ir://entity/source-program"
+entity SyntaxTree id "semantic-ir://entity/syntax-tree"
+entity SemanticIR id "semantic-ir://entity/semantic-ir"
+entity BindingMap id "semantic-ir://entity/binding-map"
+entity GeneratedGo id "semantic-ir://entity/generated-go"
+entity ProvenanceLink id "semantic-ir://entity/provenance-link"
+entity TranslationMismatch id "semantic-ir://entity/translation-mismatch"
+entity CompilationDecision id "semantic-ir://entity/compilation-decision"
+
+activity ParseSource(SourceProgram) -> SyntaxTree computes "semantic.ir:parse"
+activity LowerToIR(SyntaxTree) -> SemanticIR computes "semantic.ir:lower"
+activity BindSymbols(SemanticIR) -> BindingMap computes "semantic.ir:bind"
+activity GenerateGo(BindingMap) -> GeneratedGo computes "semantic.ir:generate"
+activity LinkProvenance(GeneratedGo) -> ProvenanceLink computes "semantic.ir:provenance"
+activity DetectMismatch(ProvenanceLink) -> TranslationMismatch computes "semantic.ir:mismatch"
+activity DecideCompilation(TranslationMismatch) -> CompilationDecision computes "semantic.ir:decide"
+activity PublishCompilation(CompilationDecision) -> SourceProgram computes "semantic.ir:publish"
