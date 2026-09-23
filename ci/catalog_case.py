@@ -6,7 +6,14 @@ from pathlib import Path
 catalog = json.loads(Path("fixtures/best-practices/catalog.json").read_text())
 if catalog.get("schema") != "gooo/best-practice-corpus/v1":
     raise SystemExit("unexpected best-practice catalog schema")
-cases = {item["id"]: item for item in catalog.get("cases", [])}
+cases = {}
+for item in catalog.get("cases", []):
+    case_id = item.get("id")
+    if not isinstance(case_id, str) or not case_id:
+        raise SystemExit("best-practice catalog case has no valid id")
+    if case_id in cases:
+        raise SystemExit(f"duplicate best-practice catalog case id: {case_id}")
+    cases[case_id] = item
 
 if len(sys.argv) == 2 and sys.argv[1] == "--count":
     print(len(cases))
