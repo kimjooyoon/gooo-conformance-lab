@@ -21,7 +21,7 @@ comparison = {
 for field in integer_fields:
     before = baseline.get(field)
     after = current.get(field)
-    valid_pair = same_identity and isinstance(before, int) and isinstance(after, int)
+    valid_pair = same_identity and type(before) is int and type(after) is int
     delta = before - after if valid_pair else None
     comparison["metrics"][field] = {
         "before": before,
