@@ -22,13 +22,14 @@ def main(path):
         fail("query operation was not exact")
 
     matches = response.get("result", {}).get("deterministic_matches", [])
-    if not any(
+    matching = [
         match.get("subject") == "billing://activity/pay-order"
         and match.get("predicate") == "used"
         and match.get("object") == "billing://entity/order"
         for match in matches
-    ):
-        fail("deterministic Order match is missing")
+    ]
+    if len(matching) != 1:
+        fail(f"deterministic Order match count is {len(matching)}, expected exactly one")
 
     print("PASS: Gooo query executed and returned a deterministic match")
 
