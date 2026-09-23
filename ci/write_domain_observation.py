@@ -15,10 +15,17 @@ args = parser.parse_args()
 catalog_path = Path("fixtures/best-practices/catalog.json")
 catalog = json.loads(catalog_path.read_text())
 observations = []
+seen_case_ids = set()
 for case in catalog["cases"]:
+    case_id = case.get("id")
+    if not isinstance(case_id, str) or not case_id:
+        raise SystemExit("catalog case has an empty or invalid id")
+    if case_id in seen_case_ids:
+        raise SystemExit(f"catalog contains duplicate case id {case_id!r}")
+    seen_case_ids.add(case_id)
     source = Path("fixtures/best-practices") / case["source"]
-    generation_receipt = Path("receipts") / f"{case['id']}.json"
-    query_receipt = Path("receipts") / f"{case['id']}-query.json"
+    generation_receipt = Path("receipts") / f"{case_id}.json"
+    query_receipt = Path("receipts") / f"{case_id}-query.json"
     for evidence in (source, generation_receipt, query_receipt):
         if not evidence.is_file():
             raise SystemExit(f"missing observation evidence: {evidence}")
@@ -32,7 +39,7 @@ for case in catalog["cases"]:
         and bool(query.get("result", {}).get("deterministic_matches"))
     )
     if not query_ok:
-        raise SystemExit(f"query receipt did not close for {case['id']}")
+        raise SystemExit(f"query receipt did not close for {case_id}")
     if case["generation"] == "PASS":
         generation_ok = (
             generation.get("command") == "generate"
@@ -51,7 +58,7 @@ for case in catalog["cases"]:
             )
         )
     if not generation_ok:
-        raise SystemExit(f"generation receipt did not match catalog state for {case['id']}")
+        raise SystemExit(f"generation receipt did not match catalog state for {case_id}")
     generation_reason = (
         "GENERATION_SUCCESS"
         if case["generation"] == "PASS"
@@ -59,7 +66,7 @@ for case in catalog["cases"]:
     )
     observations.append(
         {
-            "case_id": case["id"],
+            "case_id": case_id,
             "source": case["source"],
             "state": "CLOSED" if case["generation"] == "PASS" else "FAIL_CLOSED",
             "generation_state": case["generation"],
