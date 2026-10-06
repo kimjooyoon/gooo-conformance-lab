@@ -33,7 +33,7 @@ for case in catalog["cases"]:
     )
     if not query_ok:
         raise SystemExit(f"query receipt did not close for {case['id']}")
-    if case["generation"] == "PASS":
+    if case["generation"] in {"PASS", "SCAFFOLD"}:
         generation_ok = (
             generation.get("command") == "generate"
             and generation.get("status") == "ok"
@@ -52,16 +52,15 @@ for case in catalog["cases"]:
         )
     if not generation_ok:
         raise SystemExit(f"generation receipt did not match catalog state for {case['id']}")
-    generation_reason = (
-        "GENERATION_SUCCESS"
-        if case["generation"] == "PASS"
-        else "RUNTIME_BINDINGS_UNSUPPORTED"
-    )
-    observations.append(
-        {
+    generation_reason = {
+        "PASS": "GENERATION_SUCCESS",
+        "SCAFFOLD": "TYPED_COMPOSITION_SCAFFOLD_ONLY",
+        "FAIL_CLOSED": "GENERATION_UNSUPPORTED",
+    }[case["generation"]]
+    item = {
             "case_id": case["id"],
             "source": case["source"],
-            "state": "CLOSED" if case["generation"] == "PASS" else "FAIL_CLOSED",
+            "state": "CLOSED" if case["generation"] == "PASS" else "UNKNOWN",
             "generation_state": case["generation"],
             "generation_reason": generation_reason,
             "query_state": "CLOSED",
@@ -72,8 +71,46 @@ for case in catalog["cases"]:
             "generation_receipt_digest": digest(generation_receipt),
             "query_receipt_digest": digest(query_receipt),
             "evidence": [str(source), str(generation_receipt), str(query_receipt)],
-        }
-    )
+    }
+    runtime_contract = case.get("runtime")
+    if runtime_contract:
+        runtime_path = Path("receipts") / f"{case['id']}-runtime.json"
+        if not runtime_path.is_file():
+            raise SystemExit(f"missing runtime observation evidence: {runtime_path}")
+        runtime = json.loads(runtime_path.read_text())
+        if runtime_contract["state"] == "PASS":
+            execution = runtime.get("execution", {})
+            terminal = runtime_contract["terminal_activity"]
+            runtime_ok = (
+                runtime.get("decision") == "PASS"
+                and execution.get("activities") == runtime_contract["activities"]
+                and execution.get("deliveries") == runtime_contract["deliveries"]
+                and execution.get("results", {}).get(terminal, {}).get("value")
+                == runtime_contract["terminal_value"]
+            )
+            runtime_reason = "DECLARED_TYPED_CHAIN_EXECUTED"
+        else:
+            failure = runtime.get("failure", {})
+            execution = runtime.get("execution", {})
+            runtime_ok = (
+                runtime.get("decision") == "FAIL_CLOSED"
+                and runtime.get("reason") == runtime_contract["reason"]
+                and failure.get("step") == runtime_contract["step"]
+                and failure.get("detail") == runtime_contract["operation"]
+                and execution.get("apply_calls") == 0
+                and not execution.get("activities")
+            )
+            runtime_reason = runtime_contract["reason"]
+        if not runtime_ok:
+            raise SystemExit(f"runtime receipt did not match catalog state for {case['id']}")
+        item["state"] = runtime_contract["state"]
+        item["runtime_state"] = runtime_contract["state"]
+        item["runtime_reason"] = runtime_reason
+        item["runtime_failure_step"] = runtime_contract.get("step", "")
+        item["runtime_operation"] = runtime_contract.get("operation", "")
+        item["runtime_receipt_digest"] = digest(runtime_path)
+        item["evidence"].append(str(runtime_path))
+    observations.append(item)
 
 observation = {
     "schema": "gooo/domain-observation/v1",

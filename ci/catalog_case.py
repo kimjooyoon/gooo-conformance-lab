@@ -15,6 +15,6 @@ if len(sys.argv) != 2 or sys.argv[1] not in cases:
     raise SystemExit("unknown best-practice catalog case")
 
 case = cases[sys.argv[1]]
-if case.get("generation") not in {"PASS", "FAIL_CLOSED"}:
+if case.get("generation") not in {"PASS", "SCAFFOLD", "FAIL_CLOSED"}:
     raise SystemExit("unsupported best-practice generation state")
 print(case["generation"], case["root"], case["target"], case["entity_count"], case["activity_count"], case["bind_count"])

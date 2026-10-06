@@ -23,7 +23,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GOOO_REF: 46fe6f28fe7cd03fea904bcdbcbf21ac881f8d5e
+  GOOO_REF: e83f5e078ad476aab1ef22d7fc59998dc5bf6356
 
 jobs:
   authorized-adoption:

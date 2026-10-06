@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GOOO_REF: 46fe6f28fe7cd03fea904bcdbcbf21ac881f8d5e
+  GOOO_REF: e83f5e078ad476aab1ef22d7fc59998dc5bf6356
 
 jobs:
   execute-corpus:
@@ -80,6 +80,9 @@ jobs:
                 exit 1
               fi
               python3 ci/verify_gooo_generate.py "receipts/$name.json" "$source" "$entity_count" "$activity_count" "$bind_count"
+              if [ "$generation" = "SCAFFOLD" ]; then
+                python3 ci/verify_runtime_scaffold.py "receipts/$name.json" "$source" "$bind_count"
+              fi
               test -n "$(find "generated/$name" -type f -name '*.go' -print -quit)"
               fi
               if ! (cd meta-ontology-go && go run ./cmd/gooo query --json "../$source" --exact --root "$root" --relation prov:used --target "$target" --limit 10) > "receipts/$name-query.json"; then
@@ -212,6 +215,46 @@ jobs:
           print("verified deterministic runtime provenance replay")
           PY3
           python3 ci/verify_runtime_chain.py receipts/runtime-chain.json
+          while IFS=$'\t' read -r case_id source entry runtime_json; do
+            runtime_state="$(jq -r '.state' <<< "$runtime_json")"
+            receipt="receipts/$case_id-runtime.json"
+            if [ "$runtime_state" = "PASS" ]; then
+              if ! (cd meta-ontology-go && go run ./cmd/gooo run --json \
+                --entry "$entry" \
+                --input ../fixtures/best-practices/run-input.json \
+                "../fixtures/best-practices/$source") > "$receipt"; then
+                cat "$receipt"
+                echo "expected runtime success for $case_id" >&2
+                exit 1
+              fi
+              jq -e --argjson expected "$runtime_json" \
+                '.decision == "PASS" and
+                 .execution.activities == $expected.activities and
+                 .execution.deliveries == $expected.deliveries and
+                 .execution.results[$expected.terminal_activity].value == $expected.terminal_value' \
+                "$receipt" >/dev/null
+            elif [ "$runtime_state" = "FAIL_CLOSED" ]; then
+              if (cd meta-ontology-go && go run ./cmd/gooo run --json \
+                --entry "$entry" \
+                --input ../fixtures/best-practices/run-input.json \
+                "../fixtures/best-practices/$source") > "$receipt"; then
+                echo "unsupported runtime operation unexpectedly executed for $case_id" >&2
+                exit 1
+              fi
+              jq -e --argjson expected "$runtime_json" \
+                '.decision == "FAIL_CLOSED" and
+                 .reason == $expected.reason and
+                 .failure.step == $expected.step and
+                 .failure.detail == $expected.operation and
+                 .execution.apply_calls == 0 and
+                 ((.execution.activities // []) | length) == 0' \
+                "$receipt" >/dev/null
+            else
+              echo "unsupported runtime state $runtime_state for $case_id" >&2
+              exit 1
+            fi
+            echo "verified $runtime_state runtime observation for $case_id"
+          done < <(jq -r '.cases[] | select(.runtime != null) | [.id, .source, .runtime.entry, (.runtime | tojson)] | @tsv' fixtures/best-practices/catalog.json)
           if ! (cd meta-ontology-go && go run ./cmd/gooo compare --json \
             ../receipts/runtime-chain.json \
             ../receipts/runtime-chain-replay.json) > receipts/runtime-chain-comparison.json; then
