@@ -33,7 +33,12 @@ functionality.
 
 The generation job uses the same pinned compiler to run `gooo generate`,
 checks the JSON generation envelope, and requires a generated Go file in the
-output directory. Query and generation are separate observations.
+output directory. A `SCAFFOLD` result means the typed bind graph and Go
+composition wrapper were generated and type-checked; it does not mean the
+activity bodies are implemented. The catalog records runtime observations as a
+separate dimension: supported value chains must execute in declared order, and
+unsupported operations must fail closed before an activity is applied. Query,
+scaffold generation, and runtime execution are separate observations.
 
 ## What it does not prove
 

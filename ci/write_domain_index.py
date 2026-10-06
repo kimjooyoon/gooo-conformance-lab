@@ -29,7 +29,11 @@ for item in sorted(observation.get("observations", []), key=lambda value: value[
     if state == "CLOSED":
         next_operation = "COMPARE_AGAINST_EXACT_BASELINE"
     elif state == "FAIL_CLOSED":
-        next_operation = "PRESERVE_BOUNDARY_AND_EXTEND_RUNTIME_SUPPORT"
+        next_operation = (
+            "IMPLEMENT_MISSING_TYPED_DOMAIN_OPERATION"
+            if item.get("runtime_reason") == "VALUE_PROGRAM_UNKNOWN"
+            else "PRESERVE_BOUNDARY_AND_EXTEND_RUNTIME_SUPPORT"
+        )
     else:
         next_operation = "CLASSIFY_DOMAIN_OBSERVATION_STATE"
     cases.append(
