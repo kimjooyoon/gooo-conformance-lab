@@ -73,6 +73,11 @@ promise: candidate generation, independent evaluation, adoption, and the next
 run are separate operations. The fixture only makes their semantic boundary
 observable.
 
+The additional `fixtures/runtime/body-composition` fixtures exercise actual Gooo
+body composition rather than registered operations: a typed three-activity chain
+must produce its expected values on two native runs, while a mismatched edge must
+fail during plan validation before generation or execution.
+
 The examples intentionally stop at the language boundary. Execution evidence,
 human decisions, repository writes, and release promotion remain separate
 operations in the surrounding CI system.

@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GOOO_REF: e83f5e078ad476aab1ef22d7fc59998dc5bf6356
+  GOOO_REF: 3124f9ceb0d716138ac275c80dc05a1d7460d6f6
 
 jobs:
   execute-corpus:
@@ -255,6 +255,31 @@ jobs:
             fi
             echo "verified $runtime_state runtime observation for $case_id"
           done < <(jq -r '.cases[] | select(.runtime != null) | [.id, .source, .runtime.entry, (.runtime | tojson)] | @tsv' fixtures/best-practices/catalog.json)
+          mkdir -p generated/body-composition receipts/body-composition
+          go_bin="$(go env GOROOT)/bin/go"
+          if ! (cd meta-ontology-go && go run ./cmd/gooo body-compose \
+            --source ../fixtures/runtime/body-composition/typed-chain.gooo \
+            --cases ../fixtures/runtime/body-composition/typed-chain-cases.json \
+            --go-bin "$go_bin" \
+            --out ../generated/body-composition/typed-chain) > receipts/body-composition/typed-chain.json; then
+            cat receipts/body-composition/typed-chain.json
+            echo "typed body composition unexpectedly failed" >&2
+            exit 1
+          fi
+          python3 ci/verify_body_composition.py positive receipts/body-composition/typed-chain.json
+          set +e
+          (cd meta-ontology-go && go run ./cmd/gooo body-compose \
+            --source ../fixtures/runtime/body-composition/incompatible-edge.gooo \
+            --cases ../fixtures/runtime/body-composition/typed-chain-cases.json \
+            --go-bin "$go_bin") > receipts/body-composition/incompatible-edge.json 2> receipts/body-composition/incompatible-edge.stderr
+          compose_exit=$?
+          set -e
+          if [ "$compose_exit" -eq 0 ]; then
+            echo "incompatible typed edge unexpectedly passed" >&2
+            exit 1
+          fi
+          python3 ci/verify_body_composition.py negative receipts/body-composition/incompatible-edge.json
+          echo "Typed body composition passed 9/9 values across three activities; an incompatible edge failed before native execution." >> "$GITHUB_STEP_SUMMARY"
           if ! (cd meta-ontology-go && go run ./cmd/gooo compare --json \
             ../receipts/runtime-chain.json \
             ../receipts/runtime-chain-replay.json) > receipts/runtime-chain-comparison.json; then
@@ -397,6 +422,7 @@ jobs:
           name: gooo-best-practice-corpus
           path: |
             fixtures/best-practices
+            fixtures/runtime/body-composition
             generated
             receipts
             repair

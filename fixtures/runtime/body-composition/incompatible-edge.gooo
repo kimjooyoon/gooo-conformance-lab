@@ -1,0 +1,14 @@
+package agenthandoffruntime
+namespace agenthandoffruntime
+
+entity Text id "agent-handoff-runtime://entity/text"
+entity Boolean id "agent-handoff-runtime://entity/boolean"
+entity Candidate id "agent-handoff-runtime://entity/candidate" fields {
+    field title id "agent-handoff-runtime://candidate/title" type string required one
+    field state id "agent-handoff-runtime://candidate/state" type string required one
+}
+
+activity ProposeCandidate(Text) -> Candidate computes "return Candidate{title: input, state: \"proposed\"}"
+activity RecordIndependentReview(Boolean) -> Boolean computes "return !input"
+
+bind ProposeCandidate.result -> RecordIndependentReview.input

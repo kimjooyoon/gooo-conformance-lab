@@ -1,0 +1,24 @@
+package agenthandoffruntime
+namespace agenthandoffruntime
+
+entity Text id "agent-handoff-runtime://entity/text"
+entity Boolean id "agent-handoff-runtime://entity/boolean"
+entity Candidate id "agent-handoff-runtime://entity/candidate" fields {
+    field title id "agent-handoff-runtime://candidate/title" type string required one
+    field state id "agent-handoff-runtime://candidate/state" type string required one
+}
+entity Review id "agent-handoff-runtime://entity/review" fields {
+    field summary id "agent-handoff-runtime://review/summary" type string required one
+    field reason id "agent-handoff-runtime://review/reason" type string required one
+}
+entity Decision id "agent-handoff-runtime://entity/decision" fields {
+    field accepted id "agent-handoff-runtime://decision/accepted" type boolean required one
+    field summary id "agent-handoff-runtime://decision/summary" type string required one
+}
+
+activity ProposeCandidate(Text) -> Candidate computes "return Candidate{title: input, state: \"proposed\"}"
+activity RecordIndependentReview(Candidate, Boolean) -> Review computes `if input1 { return Review{summary: input0.title, reason: "accepted"} } else { return Review{summary: input0.title, reason: "deferred"} }`
+activity CommitCandidate(Review) -> Decision computes "return Decision{accepted: input.reason == \"accepted\", summary: input.summary}"
+
+bind ProposeCandidate.result -> RecordIndependentReview.input0
+bind RecordIndependentReview.result -> CommitCandidate.input

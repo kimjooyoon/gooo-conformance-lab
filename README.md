@@ -38,7 +38,12 @@ composition wrapper were generated and type-checked; it does not mean the
 activity bodies are implemented. The catalog records runtime observations as a
 separate dimension: supported value chains must execute in declared order, and
 unsupported operations must fail closed before an activity is applied. Query,
-scaffold generation, and runtime execution are separate observations.
+scaffold generation, and runtime execution are separate observations. A second runtime exercise uses the pinned compiler's
+`body-compose` command to compile and execute a three-activity Gooo body graph.
+It checks both typed edges, nine finite record-field and value expectations, and
+identical output hashes across two native runs. An incompatible edge is rejected
+during plan validation, before body generation or native execution. This measures
+source-body composition separately from the registered-operation `run` path.
 
 ## What it does not prove
 
