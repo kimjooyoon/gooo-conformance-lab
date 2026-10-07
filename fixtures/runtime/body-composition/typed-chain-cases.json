@@ -1,0 +1,29 @@
+{
+  "schema": "gooo/body-composition-cases/v1",
+  "cases": [
+    {
+      "inputs": {"ProposeCandidate": "change-42", "RecordIndependentReview.input1": true},
+      "expected": {
+        "ProposeCandidate": {"title": "change-42", "state": "proposed"},
+        "RecordIndependentReview": {"summary": "change-42", "reason": "accepted"},
+        "CommitCandidate": {"accepted": true, "summary": "change-42"}
+      }
+    },
+    {
+      "inputs": {"ProposeCandidate": "", "RecordIndependentReview.input1": false},
+      "expected": {
+        "ProposeCandidate": {"title": "", "state": "proposed"},
+        "RecordIndependentReview": {"summary": "", "reason": "deferred"},
+        "CommitCandidate": {"accepted": false, "summary": ""}
+      }
+    },
+    {
+      "inputs": {"ProposeCandidate": "수정안🧭", "RecordIndependentReview.input1": true},
+      "expected": {
+        "ProposeCandidate": {"title": "수정안🧭", "state": "proposed"},
+        "RecordIndependentReview": {"summary": "수정안🧭", "reason": "accepted"},
+        "CommitCandidate": {"accepted": true, "summary": "수정안🧭"}
+      }
+    }
+  ]
+}
